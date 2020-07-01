@@ -29,7 +29,7 @@ class NicoliveCommentReceiver:
 
     def make_xml(self,come):
         # xmlデータを読み込みます
-        tree = ET.parse('test.xml')
+        tree = ET.parse(os.path.join('ignore', 'commentlog.xml'))
         # ツリーを取得
         root = tree.getroot()
         # XMLファイルの生成
@@ -39,8 +39,8 @@ class NicoliveCommentReceiver:
         print(tree)
         print(come)
         print(root)
-        fl = 'test.xml'
-        tree.write(fl)
+        #fl = 'test.xml'
+        tree.write(os.path.join('ignore', 'commentlog.xml'))
 
 
 ncr = NicoliveCommentReceiver()
