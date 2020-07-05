@@ -1,0 +1,32 @@
+<setting>
+  <HcgPath>C:\xampp\htdocs\htmltest\CommentGenerator0.0.8a</HcgPath>
+  <HandleVisible>1</HandleVisible>
+  <HandleOrder>0</HandleOrder>
+  <Honorific>さん</Honorific>
+  <NoHandleType>0</NoHandleType>
+  <NoHandleName>名無し</NoHandleName>
+  <TxtColor>ffffff</TxtColor>
+  <TxtFont>Arial</TxtFont>
+  <TxtFontIndex>0</TxtFontIndex>
+  <TxtSize>18</TxtSize>
+  <BgColor>000000</BgColor>
+  <BgColorType>0</BgColorType>
+  <TxtEdgeColor>000000</TxtEdgeColor>
+  <TxtEdgeType>1</TxtEdgeType>
+  <TxtEdgeValue>5</TxtEdgeValue>
+  <SkinType>1</SkinType>
+  <SkinFile>D:\StreamingSet\CommentGenerator0.0.8a\skins\skin_messenger1.png</SkinFile>
+  <SkinFolder>D:\StreamingSet\CommentGenerator0.0.8a\test_skins</SkinFolder>
+  <TimeType>0</TimeType>
+  <TimeValue>10</TimeValue>
+  <TxtUpSpace>8</TxtUpSpace>
+  <TxtLeftSpace>15</TxtLeftSpace>
+  <TxtLength>480</TxtLength>
+  <TxtLengthValue>（ｒｙ</TxtLengthValue>
+  <Direction>0</Direction>
+  <OwnerCommentVisible>1</OwnerCommentVisible>
+  <SlashCommentVisible>1</SlashCommentVisible>
+  <BSPCommentVisible>1</BSPCommentVisible>
+  <userBGColor>0</userBGColor>
+  <userSkinName>0</userSkinName>
+</setting>

@@ -6,6 +6,7 @@ import struct
 import re
 import os
 import json
+from datetime import datetime
 from xml.dom import minidom
 import sys
 import xml.etree.ElementTree as ET
@@ -34,17 +35,29 @@ class NicoliveCommentReceiver:
         root = tree.getroot()
         # XMLファイルの生成
         element = ET.fromstring(come)
-        #tree = ET.ElementTree(element)
         root.append(element)
-        print(tree)
         print(come)
-        print(root)
-        #fl = 'test.xml'
         tree.write(os.path.join('ignore', 'commentlog.xml'))
 
 
 ncr = NicoliveCommentReceiver()
 lvno = ncr.get_lv()
+
+# commentlog.xmlをバックアップし新たなxmlを生成
+tree = ET.parse(os.path.join('ignore', 'commentlog.xml'))
+root = tree.getroot()
+chat = root.find('chat')
+print(chat)
+if chat is not None:
+    date = chat.get('date')
+    print(date)
+    time = datetime.fromtimestamp(int(date))
+    timestr = time.strftime("%Y%m%d%H%M%S")
+    tree.write(os.path.join('ignore', timestr + 'commentlog.xml'))
+
+    for chats in root.findall('chat'):
+        root.remove(chats)
+        tree.write(os.path.join('ignore', 'commentlog.xml'))
 
 
 # ニコ生にログインしてるブラウザからクッキー"user_session"の値を持ってきてsidに入れる

@@ -8,11 +8,9 @@ function Tachie(Command) {
     this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + command + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
         this.skinimage.image = new createjs.Bitmap(event.result).image;
-        console.log("リスナー指定Skin画像ファイル読み込み");
     }).bind(this), false);//注意
     this.skinloader.load();//注意
 };
 Tachie.prototype.getSkinImage = function () {
-    console.log("inside prototype.getSkinImage");
     return this.skinimage;
 };

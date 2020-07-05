@@ -2,14 +2,14 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
     <!--<link rel="stylesheet" href="css/base.css" />-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
     <script src="VoiroGokko.js"></script>
     <script>
-
-
-
         var SettingLoaded = true;
         var startTime = Math.floor(new Date().getTime() / 1000);
 
@@ -73,7 +73,6 @@
 
 
             function isComment(comment, Slash, BSP) {
-                console.log("################inside isComment#################");
                 if (comment.substring(0, 11) == "/press show") {
                     //ニコ生のBSP
                     if (BSP == 1) {
@@ -105,7 +104,7 @@
                 });
                 function parse(type) {
                     $.ajax({
-                        url: 'http://localhost/setting.xml',
+                        url: 'http://localhost/ignore/setting.xml',
                         type: 'GET',
                         dataType: 'xml',
                         cache: false,
@@ -152,7 +151,7 @@
                             setTxtFormat(txtFormat);
                         },
                         error: function () {
-                            alert("ロード失敗");
+                            alert("setting.xmlロード失敗");
                         }
                     });
                 }
@@ -171,7 +170,7 @@
                     });
                     function parse(type) {
                         $.ajax({
-                            url: 'http://localhost/test.xml',
+                            url: 'http://localhost/ignore/commentlog.xml',
                             type: 'GET',
                             dataType: 'xml',
                             cache: false,
@@ -215,10 +214,9 @@
                                                         obj[CommentNow] = CGen;
                                                         obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
                                                         stage.addChild(obj[CommentNow].getSkinImage());
-                                                        if (command.indexOf("aoi") != -1) {
-                                                            console.log("html 214 ffffffffffff");
-                                                            obj[CommentNow].getSkinImage().x -= 300;
-                                                        }
+                                                        //if (command.indexOf("aoi") != -1) {
+                                                        //    obj[CommentNow].getSkinImage().x -= 300;
+                                                        //}
                                                         //stage.addChild(obj[CommentNow].getBGColorBar());
                                                         //stage.addChild(obj[CommentNow].getEdgeCommentText());
                                                         //stage.addChild(obj[CommentNow].getCommentText());
@@ -248,7 +246,7 @@
                                 }
                             },
                             error: function () {
-                                alert("ロード失敗");
+                                alert("commentlog.xmlロード失敗");
                             }
                         });
                     }
