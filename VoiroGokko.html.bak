@@ -214,9 +214,9 @@
                                                         obj[CommentNow] = CGen;
                                                         obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
                                                         stage.addChild(obj[CommentNow].getSkinImage());
-                                                        //if (command.indexOf("aoi") != -1) {
-                                                        //    obj[CommentNow].getSkinImage().x -= 300;
-                                                        //}
+                                                        if (command.indexOf("aoi") != -1) {
+                                                            obj[CommentNow].getSkinImage().x -= 300;
+                                                        }
                                                         //stage.addChild(obj[CommentNow].getBGColorBar());
                                                         //stage.addChild(obj[CommentNow].getEdgeCommentText());
                                                         //stage.addChild(obj[CommentNow].getCommentText());
