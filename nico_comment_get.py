@@ -44,13 +44,17 @@ ncr = NicoliveCommentReceiver()
 lvno = ncr.get_lv()
 
 # commentlog.xmlをバックアップし新たなxmlを生成
+try:
+    with open ("ignore/commentlog.xml",mode='x') as f:
+        s = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><log></log>'
+        f.write(s)
+except FileExistsError:
+    pass
 tree = ET.parse(os.path.join('ignore', 'commentlog.xml'))
 root = tree.getroot()
 chat = root.find('chat')
-print(chat)
 if chat is not None:
     date = chat.get('date')
-    print(date)
     time = datetime.fromtimestamp(int(date))
     timestr = time.strftime("%Y%m%d%H%M%S")
     tree.write(os.path.join('ignore', timestr + 'commentlog.xml'))
