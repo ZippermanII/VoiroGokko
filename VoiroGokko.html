@@ -202,6 +202,7 @@
                                                 var comment = "";
                                                 comment = xml[i].firstChild.nodeValue;
                                                 var user_id = "";
+                                                var width = 0;
                                                 user_id = xml[i].getAttributeNode("user_id").value
                                                 var baseCommandStart = comment.indexOf("[");
                                                 var baseCommandEnd = comment.indexOf("]");
@@ -214,15 +215,23 @@
                                                         var CGen = new Tachie(command);
                                                         obj[CommentNow] = CGen;
                                                         obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                        //obj[CommentNow].getSkinImage.scaleX = 0.1;
                                                         if (user_id in stageDic == false) {
                                                             if (!stageDic.user_id) {
                                                                 stageDic.user_id = new createjs.Stage("myCanvas");
                                                             }
                                                         }
                                                         stageDic.user_id.addChild(obj[CommentNow].getSkinImage());
+                                                        obj[CommentNow].skinloader.addEventListener("complete", (event) => {
+                                                            console.log(CommentNow);
+                                                            console.log(obj[CommentNow - 1].getSkinImage().image.width);
+                                                        //width = this.skinimage.image.width;
+                                                        });
                                                         //stage.addChild(obj[CommentNow].getSkinImage());
                                                         if (user_id === "1166687") {
                                                             obj[CommentNow].getSkinImage().x += 550;
+                                                            obj[CommentNow].getSkinImage().scaleX = 0.1;
+                                                            console.log("##############L231");
                                                         }
                                                         if (command.indexOf("aoi") != -1) {
                                                             obj[CommentNow].getSkinImage().x += 50;
