@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 #os.system('PAUSE')
 # 放送のIDをいれる
 
+
 lvno = "lv326736005"
 
 class NicoliveCommentReceiver:

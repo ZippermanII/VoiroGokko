@@ -16,7 +16,6 @@
 
         function init() {
 
-            var stageDic = {};
             var stage = new createjs.Stage("myCanvas");
             //var bmp = new createjs.Bitmap("imgs/akane.png");
             //if (bmp == null) {
@@ -202,7 +201,7 @@
                                                 var comment = "";
                                                 comment = xml[i].firstChild.nodeValue;
                                                 var user_id = "";
-                                                var width = 0;
+                                                var natural_img_width = 0;
                                                 user_id = xml[i].getAttributeNode("user_id").value
                                                 var baseCommandStart = comment.indexOf("[");
                                                 var baseCommandEnd = comment.indexOf("]");
@@ -213,32 +212,44 @@
                                                         //PrivateSkin = TxtFormat['SkinFolder'] + "/skin_" + Handle.substr(PrivateSkinStart + 1, PrivateSkinEnd - PrivateSkinStart - 1) + ".png";
                                                         var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
                                                         var CGen = new Tachie(command);
-                                                        obj[CommentNow] = CGen;
-                                                        obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                        //obj[CommentNow].getSkinImage.scaleX = 0.1;
-                                                        if (user_id in stageDic == false) {
-                                                            if (!stageDic.user_id) {
-                                                                stageDic.user_id = new createjs.Stage("myCanvas");
-                                                            }
-                                                        }
-                                                        stageDic.user_id.addChild(obj[CommentNow].getSkinImage());
-                                                        obj[CommentNow].skinloader.addEventListener("complete", (event) => {
-                                                            console.log(CommentNow);
-                                                            console.log(obj[CommentNow - 1].getSkinImage().image.width);
-                                                        //width = this.skinimage.image.width;
-                                                        });
-                                                        //stage.addChild(obj[CommentNow].getSkinImage());
-                                                        if (user_id === "1166687") {
-                                                            obj[CommentNow].getSkinImage().x += 550;
-                                                            obj[CommentNow].getSkinImage().scaleX = 0.1;
-                                                            console.log("##############L231");
-                                                        }
-                                                        if (command.indexOf("aoi") != -1) {
-                                                            obj[CommentNow].getSkinImage().x += 50;
-                                                        }
-                                                        //stage.addChild(obj[CommentNow].getBGColorBar());
-                                                        //stage.addChild(obj[CommentNow].getEdgeCommentText());
-                                                        //stage.addChild(obj[CommentNow].getCommentText());
+                                                        var Transfilla = new Tachie("a");
+                                                        var Transfillc = new Tachie("c");
+                                                        var Transfilld = new Tachie("d");
+                                                        obj[user_id] = CGen;
+                                                        var _getSkinImage = obj[user_id].getSkinImage();
+                                                        var _transfilla = Transfilla.getSkinImage();
+                                                        var _transfillc = Transfillc.getSkinImage();
+                                                        var _transfilld = Transfilld.getSkinImage();
+                                                        //obj.y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                        stage.addChild(_transfillc);
+                                                        stage.addChild(_transfilld);
+                                                        stage.addChildAt(_transfilla,1);
+                                                        console.log(stage);
+                                                        //stage.skinloader.addEventListener("complete", (event) => {
+                                                        //    //natural_img_width = _getSkinImage.image.width;
+                                                        //    //画像位置移動
+                                                        //    //_getSkinImage.y += (stageDic.length + 2) % 3 * 360;
+                                                        //    //if (stageDic.length > 3) {
+                                                        //    //    _getSkinImage.x += 1590;
+                                                        //    //}
+                                                        //    //画像縮小
+                                                        //    //console.log(natural_img_width);
+                                                        //    //_getSkinImage.scaleX = 300 / natural_img_width;
+                                                        //    //_getSkinImage.scaleY = 300 / natural_img_width;
+                                                        //    //CommentNow++;
+                                                        //});
+                                                        //stage.addChild(obj.getSkinImage());
+                                                        //if (user_id === "1166687") {
+                                                        //    console.log(natural_img_width);
+                                                        //    _getSkinImage.x += 550;
+                                                        //    console.log("##############L231");
+                                                        //}
+                                                        //if (command.indexOf("aoi") != -1) {
+                                                        //    _getSkinImage.x += 50;
+                                                        //}
+                                                        //stage.addChild(obj.getBGColorBar());
+                                                        //stage.addChild(obj.getEdgeCommentText());
+                                                        //stage.addChild(obj.getCommentText());
                                                         //for (var i = CommentNow; i > (CommentNow - (HcgFormat['CommentMax'] - 1)); i--) {
                                                         //    if ((i - 1) >= 0) {
                                                         //        obj[(i - 1)].getSkinImage().y -= HcgFormat['SkinHeight'];
@@ -248,16 +259,15 @@
                                                         //    }
                                                         //}
 
-                                                        if ((CommentNow - HcgFormat['CommentMax']) >= 0) {
-                                                            stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getSkinImage());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getBGColorBar());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getEdgeCommentText());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getCommentText());
-                                                            delete obj[(CommentNow - HcgFormat['CommentMax'])];
-                                                        }
+                                                        //if ((CommentNow - HcgFormat['CommentMax']) >= 0) {
+                                                        //    stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getSkinImage());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getBGColorBar());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getEdgeCommentText());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getCommentText());
+                                                        //    delete obj[(CommentNow - HcgFormat['CommentMax'])];
+                                                        //}
                                                     }
                                                 }
-                                                CommentNow++;
                                             }
                                         }
                                         break;
@@ -318,7 +328,6 @@
 
             createjs.Ticker.on("tick", function () {
                 stage.update();
-                Object.values(stageDic).forEach(v => v.update());
             });
         }
     </script>
