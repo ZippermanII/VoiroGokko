@@ -16,6 +16,7 @@
 
         function init() {
 
+
             var stage = new createjs.Stage("myCanvas");
             //var bmp = new createjs.Bitmap("imgs/akane.png");
             //if (bmp == null) {
@@ -33,6 +34,7 @@
             var DemoMode = 0;	//デモモード
             /************************************************/
             var obj = [];
+            var canvas_dic = [];
             var startTime = Math.floor(new Date().getTime() / 1000);
             var startNo = -1;
             var CommentNow = 0;
@@ -181,6 +183,8 @@
                                         ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
+                                        var user_id = xml[i].getAttributeNode("user_id").value;
+                                        console.log(user_id);
                                         var SlashComment = TxtFormat['SlashCommentVisible'];
                                         var BSPComment = TxtFormat['BSPCommentVisible'];
                                         var OwnerComment = TxtFormat['OwnerCommentVisible'];
@@ -200,9 +204,7 @@
                                                 //}
                                                 var comment = "";
                                                 comment = xml[i].firstChild.nodeValue;
-                                                var user_id = "";
-                                                var natural_img_width = 0;
-                                                user_id = xml[i].getAttributeNode("user_id").value
+                                                console.log(comment);
                                                 var baseCommandStart = comment.indexOf("[");
                                                 var baseCommandEnd = comment.indexOf("]");
                                                 var faceCommandStart = fixComment(xml[i].firstChild.nodeValue).indexOf("[");
@@ -211,45 +213,36 @@
                                                     if (baseCommandEnd - baseCommandStart - 1 > 0) {
                                                         //PrivateSkin = TxtFormat['SkinFolder'] + "/skin_" + Handle.substr(PrivateSkinStart + 1, PrivateSkinEnd - PrivateSkinStart - 1) + ".png";
                                                         var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
-                                                        var CGen = new Tachie(command);
-                                                        var Transfilla = new Tachie("a");
-                                                        var Transfillc = new Tachie("c");
-                                                        var Transfilld = new Tachie("d");
-                                                        obj[user_id] = CGen;
-                                                        var _getSkinImage = obj[user_id].getSkinImage();
-                                                        var _transfilla = Transfilla.getSkinImage();
-                                                        var _transfillc = Transfillc.getSkinImage();
-                                                        var _transfilld = Transfilld.getSkinImage();
-                                                        //obj.y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                        stage.addChild(_transfillc);
-                                                        stage.addChild(_transfilld);
-                                                        stage.addChildAt(_transfilla,1);
-                                                        console.log(stage);
-                                                        //stage.skinloader.addEventListener("complete", (event) => {
-                                                        //    //natural_img_width = _getSkinImage.image.width;
-                                                        //    //画像位置移動
-                                                        //    //_getSkinImage.y += (stageDic.length + 2) % 3 * 360;
-                                                        //    //if (stageDic.length > 3) {
-                                                        //    //    _getSkinImage.x += 1590;
-                                                        //    //}
-                                                        //    //画像縮小
-                                                        //    //console.log(natural_img_width);
-                                                        //    //_getSkinImage.scaleX = 300 / natural_img_width;
-                                                        //    //_getSkinImage.scaleY = 300 / natural_img_width;
-                                                        //    //CommentNow++;
-                                                        //});
-                                                        //stage.addChild(obj.getSkinImage());
-                                                        //if (user_id === "1166687") {
-                                                        //    console.log(natural_img_width);
-                                                        //    _getSkinImage.x += 550;
-                                                        //    console.log("##############L231");
-                                                        //}
-                                                        //if (command.indexOf("aoi") != -1) {
-                                                        //    _getSkinImage.x += 50;
-                                                        //}
-                                                        //stage.addChild(obj.getBGColorBar());
-                                                        //stage.addChild(obj.getEdgeCommentText());
-                                                        //stage.addChild(obj.getCommentText());
+                                                        //新規キャンバス作成
+                                                        //1user:1canvasの方針に変更
+                                                        if (command) {
+                                                            if (!canvas_dic[user_id]) {
+                                                                console.log("#############L220");
+                                                                var add_canvas = document.createElement("canvas");
+                                                                add_canvas.id = user_id;
+                                                                var user_canvas = document.body.appendChild(add_canvas);
+                                                                canvas_dic[user_id] = user_canvas;
+                                                                user_canvas.style.position = "absolute";
+                                                                //var left = 100;
+                                                                //var top = 50;
+                                                                //user_canvas.style.left = (String(left) + "px");
+                                                                //user_canvas.style.top = (String(top) + "px");
+                                                                //var ctx = user_canvas.getContext("2d");
+                                                                var user_stage = new createjs.Stage(canvas_dic[user_id]);
+                                                                console.log(canvas_dic);
+                                                                var CGen = new Tachie(command);
+                                                                obj[CommentNow] = CGen;
+                                                                obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                                user_stage.addChild(obj[CommentNow].getSkinImage());
+                                                                user_stage.update();
+                                                                console.log(user_stage);
+                                                                if (command.indexOf("aoi") != -1) {
+                                                                }
+                                                            }
+                                                        }
+                                                        //stage.addChild(obj[CommentNow].getBGColorBar());
+                                                        //stage.addChild(obj[CommentNow].getEdgeCommentText());
+                                                        //stage.addChild(obj[CommentNow].getCommentText());
                                                         //for (var i = CommentNow; i > (CommentNow - (HcgFormat['CommentMax'] - 1)); i--) {
                                                         //    if ((i - 1) >= 0) {
                                                         //        obj[(i - 1)].getSkinImage().y -= HcgFormat['SkinHeight'];
@@ -268,6 +261,7 @@
                                                         //}
                                                     }
                                                 }
+                                                CommentNow++;
                                             }
                                         }
                                         break;
@@ -327,12 +321,12 @@
 
 
             createjs.Ticker.on("tick", function () {
-                stage.update();
+                //stage.update();                
             });
         }
     </script>
 </head>
-    <body onload="init();">
-        <canvas id="myCanvas" width="1920" height="1080"></canvas>
-    </body>
-    </html>
+<body onload="init();">
+    <canvas id="myCanvas" width="960" height="540"></canvas>
+</body>
+</html>
