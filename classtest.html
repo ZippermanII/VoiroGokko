@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <!--<link rel="stylesheet" href="css/base.css" />-->
+    <script>
+
+        class Canvases {
+
+            canvasdic = {}; 
+
+            //constructor(a) {
+            //    this.a = document.getElementById(this.bbbbb);
+            //    //this.b = document.getElementById('myCanvas1');
+            //    //this.c = document.getElementById('myCanvas2');
+            //    //this.d = document.getElementById('myCanvas3');
+            //    //this.e = document.getElementById('myCanvas4');
+            //    //this.f = document.getElementById('myCanvas5');
+            //}
+
+            bbbbb(canvas_id) {
+                var b = "myCanvas" + canvas_id;
+                return b;
+            }
+
+            //idに"myCanvas"が含まれるキャンバスを配列に格納
+            mycanvas_array() {
+                var node_list = document.querySelectorAll("canvas");
+                var array = Array.from(node_list);
+                for (var i = 0; i < array.length; i++) {
+                    var target = array[i].id.indexOf("myCanvas");
+                    console.log(target);
+                    if (target == -1) {
+                        array.splice(i, 1);
+                    }
+                }
+                return array;
+            }
+
+            mycanvas_count(func) {
+                var count = func().length;
+                return count;
+            }
+
+
+            //キャンバスに対して占有の可否を判定
+            target_available(canvas_id) {
+                //var b = "myCanvas" + canvas_id;
+                console.log(canvas_id);
+                var target_canvas = document.getElementById(canvas_id);
+                if (target_canvas.width == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            //キャンバスに対して占有ユーザーを設定
+            set_owner(user_id) {
+                this.canvasdic[user_id] = document.getElementById('myCanvas0');
+            }
+
+            //キャンバスに対して占有ユーザー設定を解除
+            release_owner(user_id) {
+                delete this.canvasdic[user_id];
+            }
+
+            //
+
+
+        }
+
+        function init() {
+            canvases = new Canvases;
+            canvases.set_owner("123456");
+            console.log(canvases.canvasdic);
+            canvases.release_owner("123456");
+            console.log(canvases.mycanvas_array().length);
+            console.log(canvases.mycanvas_count(canvases.mycanvas_array));
+
+            //for (var i = 0; i < 6; i++) {
+            //    console.log(canvases.target_available("myCanvas" + i));
+            //}
+        }
+
+    </script>
+</head>
+<body onload="init();">
+    <canvas id="myCanvas0" width="0" height="0"></canvas>
+    <canvas id="myCanvas1" width="10" height="0"></canvas>
+    <canvas id="myCanvas2" width="20" height="0"></canvas>
+    <canvas id="myCanvas3" width="30" height="0"></canvas>
+    <canvas id="myCanvas4" width="40" height="0"></canvas>
+    <canvas id="myCanvas5" width="50" height="0"></canvas>
+    <canvas id="otherCanvas5" width="50" height="0"></canvas>
+</body>
+</html>

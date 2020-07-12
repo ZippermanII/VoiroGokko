@@ -12,10 +12,10 @@
     <script>
         var SettingLoaded = true;
         var startTime = Math.floor(new Date().getTime() / 1000);
-
-
+        
         function init() {
 
+            console.log("#############L19");
 
             var stage = new createjs.Stage("myCanvas");
             //var bmp = new createjs.Bitmap("imgs/akane.png");
@@ -35,6 +35,8 @@
             /************************************************/
             var obj = [];
             var canvas_dic = [];
+            var stage_dic = [];
+            var aaaaaaaaaaaaaaaa = 0;
             var startTime = Math.floor(new Date().getTime() / 1000);
             var startNo = -1;
             var CommentNow = 0;
@@ -216,28 +218,54 @@
                                                         //新規キャンバス作成
                                                         //1user:1canvasの方針に変更
                                                         if (command) {
-                                                            if (!canvas_dic[user_id]) {
+                                                            if (command == "delete") {
+                                                                var target_canvas = canvas_dic[user_id];
+                                                                canvas_dic[user_id].width = 0;
+                                                                canvas_dic[user_id].height = 0;
+                                                            }
+                                                            else if (!canvas_dic[user_id]) {
+                                                                aaaaaaaaaaaaaaaa += 200;
                                                                 console.log("#############L220");
                                                                 var add_canvas = document.createElement("canvas");
                                                                 add_canvas.id = user_id;
+                                                                add_canvas.width = 1920;
+                                                                add_canvas.height = 1080;
                                                                 var user_canvas = document.body.appendChild(add_canvas);
                                                                 canvas_dic[user_id] = user_canvas;
                                                                 user_canvas.style.position = "absolute";
-                                                                //var left = 100;
-                                                                //var top = 50;
-                                                                //user_canvas.style.left = (String(left) + "px");
-                                                                //user_canvas.style.top = (String(top) + "px");
-                                                                //var ctx = user_canvas.getContext("2d");
-                                                                var user_stage = new createjs.Stage(canvas_dic[user_id]);
+                                                                var left = 0;
+                                                                var top = 0;
+                                                                //別idの人からのコマンドで画像位置変更
+                                                                if (true) {
+                                                                    left += aaaaaaaaaaaaaaaa;
+                                                                }
+                                                                user_canvas.style.left = (String(left) + "px");
+                                                                user_canvas.style.top = (String(top) + "px");
+                                                                stage_dic[user_id] = new createjs.Stage(user_id);
                                                                 console.log(canvas_dic);
+                                                                console.log(stage_dic[user_id]);
                                                                 var CGen = new Tachie(command);
                                                                 obj[CommentNow] = CGen;
                                                                 obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                                user_stage.addChild(obj[CommentNow].getSkinImage());
-                                                                user_stage.update();
-                                                                console.log(user_stage);
+                                                                stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
+                                                                createjs.Ticker.on("tick", function () {
+                                                                    stage_dic[user_id].update();
+                                                                });
+                                                                console.log(stage_dic[user_id]);
                                                                 if (command.indexOf("aoi") != -1) {
                                                                 }
+                                                            }
+                                                            else {
+                                                                stage_dic[user_id].removeChildAt(0);
+                                                                canvas_dic[user_id].width = 1920;
+                                                                canvas_dic[user_id].height = 1080;
+                                                                var CGen = new Tachie(command);
+                                                                obj[CommentNow] = CGen;
+                                                                obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                                stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
+                                                                createjs.Ticker.on("tick", function () {
+                                                                    stage_dic[user_id].update();
+                                                                });
                                                             }
                                                         }
                                                         //stage.addChild(obj[CommentNow].getBGColorBar());
@@ -321,12 +349,12 @@
 
 
             createjs.Ticker.on("tick", function () {
-                //stage.update();                
+                stage.update();
             });
         }
     </script>
 </head>
 <body onload="init();">
-    <canvas id="myCanvas" width="960" height="540"></canvas>
+    <canvas id="myCanvas" width="0" height="0"></canvas>
 </body>
 </html>
