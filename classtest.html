@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,95 +6,39 @@
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <!--<link rel="stylesheet" href="css/base.css" />-->
+    <script src="Classtest.js"></script>
     <script>
 
-        class Canvases {
-
-            canvasdic = {}; 
-
-            //constructor(a) {
-            //    this.a = document.getElementById(this.bbbbb);
-            //    //this.b = document.getElementById('myCanvas1');
-            //    //this.c = document.getElementById('myCanvas2');
-            //    //this.d = document.getElementById('myCanvas3');
-            //    //this.e = document.getElementById('myCanvas4');
-            //    //this.f = document.getElementById('myCanvas5');
-            //}
-
-            bbbbb(canvas_id) {
-                var b = "myCanvas" + canvas_id;
-                return b;
-            }
-
-            //id‚É"myCanvas"‚ªŠÜ‚Ü‚ê‚éƒLƒƒƒ“ƒoƒX‚ð”z—ñ‚ÉŠi”[
-            mycanvas_array() {
-                var node_list = document.querySelectorAll("canvas");
-                var array = Array.from(node_list);
-                for (var i = 0; i < array.length; i++) {
-                    var target = array[i].id.indexOf("myCanvas");
-                    console.log(target);
-                    if (target == -1) {
-                        array.splice(i, 1);
-                    }
-                }
-                return array;
-            }
-
-            mycanvas_count(func) {
-                var count = func().length;
-                return count;
-            }
-
-
-            //ƒLƒƒƒ“ƒoƒX‚É‘Î‚µ‚Äè—L‚Ì‰Â”Û‚ð”»’è
-            target_available(canvas_id) {
-                //var b = "myCanvas" + canvas_id;
-                console.log(canvas_id);
-                var target_canvas = document.getElementById(canvas_id);
-                if (target_canvas.width == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            //ƒLƒƒƒ“ƒoƒX‚É‘Î‚µ‚Äè—Lƒ†[ƒU[‚ðÝ’è
-            set_owner(user_id) {
-                this.canvasdic[user_id] = document.getElementById('myCanvas0');
-            }
-
-            //ƒLƒƒƒ“ƒoƒX‚É‘Î‚µ‚Äè—Lƒ†[ƒU[Ý’è‚ð‰ðœ
-            release_owner(user_id) {
-                delete this.canvasdic[user_id];
-            }
-
-            //
-
-
-        }
+        var myCanvasWrapper;
+        var node_list;
+        var canvas_array = [];
+        var canvas_dic = {};
+        var canvases = new Canvases;
+        var user_id = "123456789";
 
         function init() {
-            canvases = new Canvases;
-            canvases.set_owner("123456");
-            console.log(canvases.canvasdic);
-            canvases.release_owner("123456");
-            console.log(canvases.mycanvas_array().length);
-            console.log(canvases.mycanvas_count(canvases.mycanvas_array));
-
-            //for (var i = 0; i < 6; i++) {
-            //    console.log(canvases.target_available("myCanvas" + i));
-            //}
+            console.log(document.getElementById("myCanvasWrapper").children.length);
+            if (document.getElementById("myCanvasWrapper").children.length < 6) {
+                var new_canvas = canvases.Create(user_id);
+                document.getElementById("myCanvasWrapper").appendChild(new_canvas);
+            }
+            var node_list = document.querySelectorAll('#myCanvasWrapper canvas');
+            console.log(node_list);
         }
 
     </script>
 </head>
 <body onload="init();">
-    <canvas id="myCanvas0" width="0" height="0"></canvas>
-    <canvas id="myCanvas1" width="10" height="0"></canvas>
-    <canvas id="myCanvas2" width="20" height="0"></canvas>
-    <canvas id="myCanvas3" width="30" height="0"></canvas>
-    <canvas id="myCanvas4" width="40" height="0"></canvas>
-    <canvas id="myCanvas5" width="50" height="0"></canvas>
-    <canvas id="otherCanvas5" width="50" height="0"></canvas>
+    <div id="myCanvasWrapper">
+        <canvas id="myCanvas0" width="0" height="0"></canvas>
+        <canvas id="myCanvas1" width="10" height="0"></canvas>
+        <canvas id="myCanvas2" width="20" height="0"></canvas>
+        <canvas id="myCanvas3" width="30" height="0"></canvas>
+        <canvas id="myCanvas4" width="30" height="0"></canvas>
+        <canvas id="myCanvas5" width="30" height="0"></canvas>
+    </div>
+    <div>
+        <canvas id="otherCanvas5" width="50" height="0"></canvas>
+    </div>
 </body>
 </html>
