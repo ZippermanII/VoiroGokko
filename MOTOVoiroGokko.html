@@ -12,11 +12,10 @@
     <script>
         var SettingLoaded = true;
         var startTime = Math.floor(new Date().getTime() / 1000);
-
-
+        
         function init() {
 
-
+            
             var stage = new createjs.Stage("myCanvas");
             //var bmp = new createjs.Bitmap("imgs/akane.png");
             //if (bmp == null) {
@@ -34,6 +33,9 @@
             var DemoMode = 0;	//デモモード
             /************************************************/
             var obj = [];
+            var canvas_dic = [];
+            var stage_dic = [];
+            var aaaaaaaaaaaaaaaa = 0;
             var startTime = Math.floor(new Date().getTime() / 1000);
             var startNo = -1;
             var CommentNow = 0;
@@ -56,7 +58,7 @@
             createjs.Ticker.addEventListener('tick', mainLoop);
             function mainLoop() {
                 console.log("tick");
-                stage.update();
+                //stage.update();
             }
 
 
@@ -182,6 +184,8 @@
                                         ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
+                                        var user_id = xml[i].getAttributeNode("user_id").value;
+                                        console.log(user_id);
                                         var SlashComment = TxtFormat['SlashCommentVisible'];
                                         var BSPComment = TxtFormat['BSPCommentVisible'];
                                         var OwnerComment = TxtFormat['OwnerCommentVisible'];
@@ -210,12 +214,58 @@
                                                     if (baseCommandEnd - baseCommandStart - 1 > 0) {
                                                         //PrivateSkin = TxtFormat['SkinFolder'] + "/skin_" + Handle.substr(PrivateSkinStart + 1, PrivateSkinEnd - PrivateSkinStart - 1) + ".png";
                                                         var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
-                                                        var CGen = new Tachie(command);
-                                                        obj[CommentNow] = CGen;
-                                                        obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                        stage.addChild(obj[CommentNow].getSkinImage());
-                                                        if (command.indexOf("aoi") != -1) {
-                                                            obj[CommentNow].getSkinImage().x -= 300;
+                                                        //新規キャンバス作成
+                                                        //1user:1canvasの方針に変更
+                                                        if (command) {
+                                                            if (command == "delete") {
+                                                                var target_canvas = canvas_dic[user_id];
+                                                                canvas_dic[user_id].width = 0;
+                                                                canvas_dic[user_id].height = 0;
+                                                            }
+                                                            else if (!canvas_dic[user_id]) {
+                                                                aaaaaaaaaaaaaaaa += 200;
+                                                                console.log("#############L220");
+                                                                var add_canvas = document.createElement("canvas");
+                                                                add_canvas.id = user_id;
+                                                                add_canvas.width = 1920;
+                                                                add_canvas.height = 1080;
+                                                                var user_canvas = document.body.appendChild(add_canvas);
+                                                                canvas_dic[user_id] = user_canvas;
+                                                                user_canvas.style.position = "absolute";
+                                                                var left = 0;
+                                                                var top = 0;
+                                                                //別idの人からのコマンドで画像位置変更
+                                                                if (true) {
+                                                                    left += aaaaaaaaaaaaaaaa;
+                                                                }
+                                                                user_canvas.style.left = (String(left) + "px");
+                                                                user_canvas.style.top = (String(top) + "px");
+                                                                stage_dic[user_id] = new createjs.Stage(user_id);
+                                                                console.log(canvas_dic);
+                                                                console.log(stage_dic[user_id]);
+                                                                var CGen = new Tachie(command);
+                                                                obj[CommentNow] = CGen;
+                                                                obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                                stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
+                                                                createjs.Ticker.on("tick", function () {
+                                                                    stage_dic[user_id].update();
+                                                                });
+                                                                console.log(stage_dic[user_id]);
+                                                                if (command.indexOf("aoi") != -1) {
+                                                                }
+                                                            }
+                                                            else {
+                                                                stage_dic[user_id].removeChildAt(0);
+                                                                canvas_dic[user_id].width = 1920;
+                                                                canvas_dic[user_id].height = 1080;
+                                                                var CGen = new Tachie(command);
+                                                                obj[CommentNow] = CGen;
+                                                                obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
+                                                                stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
+                                                                createjs.Ticker.on("tick", function () {
+                                                                    stage_dic[user_id].update();
+                                                                });
+                                                            }
                                                         }
                                                         //stage.addChild(obj[CommentNow].getBGColorBar());
                                                         //stage.addChild(obj[CommentNow].getEdgeCommentText());
@@ -229,13 +279,13 @@
                                                         //    }
                                                         //}
 
-                                                        if ((CommentNow - HcgFormat['CommentMax']) >= 0) {
-                                                            stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getSkinImage());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getBGColorBar());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getEdgeCommentText());
-                                                            //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getCommentText());
-                                                            delete obj[(CommentNow - HcgFormat['CommentMax'])];
-                                                        }
+                                                        //if ((CommentNow - HcgFormat['CommentMax']) >= 0) {
+                                                        //    stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getSkinImage());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getBGColorBar());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getEdgeCommentText());
+                                                        //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getCommentText());
+                                                        //    delete obj[(CommentNow - HcgFormat['CommentMax'])];
+                                                        //}
                                                     }
                                                 }
                                                 CommentNow++;
@@ -303,7 +353,7 @@
         }
     </script>
 </head>
-    <body onload="init();">
-        <canvas id="myCanvas" width="960" height="540"></canvas>
-    </body>
-    </html>
+<body onload="init();">
+    <canvas id="myCanvas" width="0" height="0"></canvas>
+</body>
+</html>

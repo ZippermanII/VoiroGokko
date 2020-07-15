@@ -1,6 +1,6 @@
 // JavaScript source code
 
-function Tachie(Command) {
+function TachieLoader(Command) {
     //ƒXƒLƒ“‰Šúİ’è
     var command = Command;
     var y = 0; 
@@ -13,6 +13,6 @@ function Tachie(Command) {
     }).bind(this), false);//’ˆÓ
     this.skinloader.load();//’ˆÓ
 };
-Tachie.prototype.getSkinImage = function () {
+TachieLoader.prototype.getSkinImage = function () {
     return this.skinimage;
 };
