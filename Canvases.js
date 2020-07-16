@@ -1,15 +1,15 @@
-// JavaScript source code
+ï»¿// JavaScript source code
 
 class Canvases {
 
-    //V‹KƒLƒƒƒ“ƒoƒX‚ğì¬
+    //æ–°è¦ã‚­ãƒ£ãƒ³ãƒã‚¹ã‚’ä½œæˆ
     Create(user_id) {
         var new_canvas = document.createElement("canvas");
         new_canvas.id = user_id;
         return new_canvas;
     }
 
-    //ƒLƒƒƒ“ƒoƒX‚ğíœ
+    //ã‚­ãƒ£ãƒ³ãƒã‚¹ã‚’å‰Šé™¤
     Delete() {
 
     }

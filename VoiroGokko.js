@@ -1,17 +1,17 @@
-// JavaScript source code
+ï»¿// JavaScript source code
 
 function TachieLoader(Command) {
-    //ƒXƒLƒ“‰Šúİ’è
+    //ã‚¹ã‚­ãƒ³åˆæœŸè¨­å®š
     var command = Command;
     var y = 0; 
     var width = 0;
-    this.skinimage = new createjs.Bitmap();//‹ó‰æ‘œ
+    this.skinimage = new createjs.Bitmap();//ç©ºç”»åƒ
     this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + command + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
         this.skinimage.image = new createjs.Bitmap(event.result).image;
         //console.log(this.skinimage.image.width);
-    }).bind(this), false);//’ˆÓ
-    this.skinloader.load();//’ˆÓ
+    }).bind(this), false);//æ³¨æ„
+    this.skinloader.load();//æ³¨æ„
 };
 TachieLoader.prototype.getSkinImage = function () {
     return this.skinimage;
