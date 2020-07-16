@@ -38,7 +38,7 @@
                     });
                     function parse(type) {
                         $.ajax({
-                            url: 'http://localhost/ignore/commentlog.xml',
+                            url: 'http://localhost/ignore/dummycommentlog.xml',
                             type: 'GET',
                             dataType: 'xml',
                             cache: false,
@@ -67,7 +67,6 @@
                                                         target_canvas.remove()
                                                     }
                                                     else if (!document.getElementById(user_id)) {
-                                                        console.log("##############L76");
                                                         var canvas_count = document.getElementById("UserCanvasWrapper").children.length;
                                                         console.log(canvas_count);
                                                         if (canvas_count < 6) {
@@ -90,9 +89,10 @@
                                                         stage_dic[user_id] = new createjs.Stage(target_canvas);
                                                         var _tachieLoader = new TachieLoader(command);
                                                         stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
-                                                        createjs.Ticker.on("tick", function () {
-                                                            stage_dic[user_id].update();
-                                                        })
+                                                        //初回呼び出し時のtickerでupdateしておけば二度目はいらない？のでコメント化
+                                                        //createjs.Ticker.on("tick", function () {
+                                                        //    stage_dic[user_id].update();
+                                                        //})
                                                     }
                                                 }
 
@@ -201,9 +201,6 @@
 </head>
 <body onload="init();">
     <div id="UserCanvasWrapper">
-        <canvas id="otherCanvas" width="50" height="0"></canvas>
-        <canvas id="otherCanvas1" width="50" height="0"></canvas>
-        <canvas id="otherCanvas2" width="50" height="0"></canvas>
     </div>
     <div id="another">
         <canvas id="otherCanvas5" width="50" height="0"></canvas>

@@ -3,8 +3,6 @@
 function TachieLoader(Command) {
     //スキン初期設定
     var command = Command;
-    var y = 0; 
-    var width = 0;
     this.skinimage = new createjs.Bitmap();//空画像
     this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + command + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
