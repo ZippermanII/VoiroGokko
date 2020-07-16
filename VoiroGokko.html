@@ -21,9 +21,6 @@
         function init() {
 
             var startTime = Math.floor(new Date().getTime() / 1000);
-            var node_list = document.querySelectorAll('#UserCanvasWrapper canvas');
-
-
             var CommentTimer = setInterval(CommentFunc, 500);
 
             function CommentFunc() {
@@ -67,7 +64,6 @@
                                                         target_canvas.remove()
                                                     }
                                                     else if (!document.getElementById(user_id)) {
-                                                        console.log("##############L76");
                                                         var canvas_count = document.getElementById("UserCanvasWrapper").children.length;
                                                         console.log(canvas_count);
                                                         if (canvas_count < 6) {
@@ -90,95 +86,14 @@
                                                         stage_dic[user_id] = new createjs.Stage(target_canvas);
                                                         var _tachieLoader = new TachieLoader(command);
                                                         stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
-                                                        createjs.Ticker.on("tick", function () {
-                                                            stage_dic[user_id].update();
-                                                        })
+                                                        //初回呼び出し時のtickerでupdateしておけば二度目はいらない？のでコメント化
+                                                        //createjs.Ticker.on("tick", function () {
+                                                        //    stage_dic[user_id].update();
+                                                        //})
                                                     }
                                                 }
-
-
-
-
-                                                //if (command) {
-                                                //    if (command == "delete") {
-                                                //        var target_canvas = canvas_dic[user_id];
-                                                //        canvas_dic[user_id].width = 0;
-                                                //        canvas_dic[user_id].height = 0;
-                                                //    }
-                                                //    else if (!canvas_dic[user_id]) {
-                                                //        aaaaaaaaaaaaaaaa += 200;
-                                                //        console.log("#############L220");
-                                                //        var add_canvas = document.createElement("canvas");
-                                                //        add_canvas.id = user_id;
-                                                //        add_canvas.width = 1920;
-                                                //        add_canvas.height = 1080;
-                                                //        var user_canvas = document.body.appendChild(add_canvas);
-                                                //        canvas_dic[user_id] = user_canvas;
-                                                //        user_canvas.style.position = "absolute";
-                                                //        var left = 0;
-                                                //        var top = 0;
-                                                //        //別idの人からのコマンドで画像位置変更
-                                                //        if (true) {
-                                                //            left += aaaaaaaaaaaaaaaa;
-                                                //        }
-                                                //        user_canvas.style.left = (String(left) + "px");
-                                                //        user_canvas.style.top = (String(top) + "px");
-                                                //        stage_dic[user_id] = new createjs.Stage(user_id);
-                                                //        console.log(canvas_dic);
-                                                //        console.log(stage_dic[user_id]);
-                                                //        var CGen = new Tachie(command);
-                                                //        obj[CommentNow] = CGen;
-                                                //        obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                //        stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
-                                                //        createjs.Ticker.on("tick", function () {
-                                                //            stage_dic[user_id].update();
-                                                //        });
-                                                //        console.log(stage_dic[user_id]);
-                                                //        if (command.indexOf("aoi") != -1) {
-                                                //        }
-                                                //    }
-                                                //    else {
-                                                //        stage_dic[user_id].removeChildAt(0);
-                                                //        canvas_dic[user_id].width = 1920;
-                                                //        canvas_dic[user_id].height = 1080;
-                                                //        var CGen = new Tachie(command);
-                                                //        obj[CommentNow] = CGen;
-                                                //        obj[CommentNow].y = HcgFormat['SkinHeight'] * (HcgFormat['CommentMax'] - 1);
-                                                //        stage_dic[user_id].addChild(obj[CommentNow].getSkinImage());
-                                                //        createjs.Ticker.on("tick", function () {
-                                                //            stage_dic[user_id].update();
-                                                //        });
-                                                //    }
-                                                //}
-                                                //stage.addChild(obj[CommentNow].getBGColorBar());
-                                                //stage.addChild(obj[CommentNow].getEdgeCommentText());
-                                                //stage.addChild(obj[CommentNow].getCommentText());
-                                                //for (var i = CommentNow; i > (CommentNow - (HcgFormat['CommentMax'] - 1)); i--) {
-                                                //    if ((i - 1) >= 0) {
-                                                //        obj[(i - 1)].getSkinImage().y -= HcgFormat['SkinHeight'];
-                                                //        //obj[(i - 1)].getBGColorBar().y -= HcgFormat['SkinHeight'];
-                                                //        //obj[(i - 1)].getEdgeCommentText().y -= HcgFormat['SkinHeight'];
-                                                //        //obj[(i - 1)].getCommentText().y -= HcgFormat['SkinHeight'];
-                                                //    }
-                                                //}
-
-                                                //if ((CommentNow - HcgFormat['CommentMax']) >= 0) {
-                                                //    stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getSkinImage());
-                                                //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getBGColorBar());
-                                                //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getEdgeCommentText());
-                                                //    //stage.removeChild(obj[(CommentNow - HcgFormat['CommentMax'])].getCommentText());
-                                                //    delete obj[(CommentNow - HcgFormat['CommentMax'])];
-                                                //}
                                             }
                                         }
-                                        //CommentNow++;
-                                        //var SlashComment = TxtFormat['SlashCommentVisible'];
-                                        //var BSPComment = TxtFormat['BSPCommentVisible'];
-                                        //var OwnerComment = TxtFormat['OwnerCommentVisible'];
-                                        //if (isComment(xml[i].firstChild.nodeValue, SlashComment, BSPComment)) {
-                                        //    if (OwnerComment == 1 || ((OwnerComment == 0) && (xml[i].getAttributeNode("owner").value != 1))) {
-                                        //    }
-                                        //}
                                         break;
                                     }
                                 }
@@ -191,19 +106,12 @@
                 }
             }
             window.addEventListener("load", init);
-
-
-            //var node_list = document.querySelectorAll('#UserCanvasWrapper canvas');
-            //console.log(node_list);
         }
 
     </script>
 </head>
 <body onload="init();">
     <div id="UserCanvasWrapper">
-        <canvas id="otherCanvas" width="50" height="0"></canvas>
-        <canvas id="otherCanvas1" width="50" height="0"></canvas>
-        <canvas id="otherCanvas2" width="50" height="0"></canvas>
     </div>
     <div id="another">
         <canvas id="otherCanvas5" width="50" height="0"></canvas>
