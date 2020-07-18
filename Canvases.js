@@ -26,18 +26,17 @@ class Canvases {
 }
 
     //新規キャンバスを作成
-    Create(user_id, canvas_count) {
+    Create(user_id, available_position) {
         var new_canvas = document.createElement("canvas");
         var style = new_canvas.style;
-        new_canvas.setAttribute("data-position", canvas_count);
+        new_canvas.setAttribute("data-position", available_position);
         new_canvas.id = user_id;
         new_canvas.width = 400;
         new_canvas.height = 1080;
         new_canvas.style.position = "absolute";
-        new_canvas.style.zIndex = this.layer;
+        new_canvas.style.zIndex = 10000 - available_position;
         //ポジションにあわせて描画位置を調整
-        if (canvas_count % 2 == 1) {
-            console.log("canvas_count % 2 == 1");
+        if (available_position % 2 == 1) {
             new_canvas.style.left = "1600px";
         }
         else {
@@ -45,11 +44,11 @@ class Canvases {
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }
         var top = 0;
-        if (canvas_count < 2) {
+        if (available_position < 2) {
             top += 600;
             new_canvas.style.top = top + "px";
         }
-        else if (canvas_count < 4) {
+        else if (available_position < 4) {
             top += 300;
             new_canvas.style.top = top + "px";
         }
@@ -57,7 +56,6 @@ class Canvases {
             top -= 50;
             new_canvas.style.top = top + "px";
         }
-        this.layer -= 1;
         return new_canvas;
     }
 

@@ -11,10 +11,9 @@
     <script src="VoiroGokko.js"></script>
     <script src="Canvases.js"></script>
     <script>
-
         var canvases = new Canvases;
         var user_id = "123456789";
-        var stage_dic = {};
+        var user_stage = {};
 
 
 
@@ -48,10 +47,8 @@
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
                                         var user_id = xml[i].getAttributeNode("user_id").value;
-                                        console.log(user_id);
                                         var comment = "";
                                         comment = xml[i].firstChild.nodeValue;
-                                        console.log(comment);
                                         //ニコ生のコメントからコマンドを取得
                                         var baseCommandStart = comment.indexOf("[");
                                         var baseCommandEnd = comment.indexOf("]");
@@ -64,30 +61,53 @@
                                                         target_canvas.remove()
                                                     }
                                                     else if (!document.getElementById(user_id)) {
-                                                        var canvas_count = document.getElementById("UserCanvasWrapper").children.length;
-                                                        console.log(canvas_count);
+                                                        var user_canvases = document.getElementById("UserCanvasWrapper").children;
+                                                        var array = [];
+                                                        var available_position = 0;
+                                                        var canvas_count = user_canvases.length;
+                                                        //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
+                                                        for (var i = 0; i < 6; i++) {
+                                                            if (user_canvases[i]) {
+                                                                array[i] = Number(user_canvases[i].getAttribute("data-position"));
+                                                            }
+                                                            else {
+                                                                break;
+                                                            }
+                                                        }
+                                                        array.sort(function(a,b){
+                                                                if( a < b ) return -1;
+                                                                if( a > b ) return 1;
+                                                                return 0;
+                                                        });
+                                                        for (let index = 0; index < array.length; index++) {
+                                                            if (array[index] != index) {
+                                                                available_position = index;
+                                                                break;
+                                                            }
+                                                            else{
+                                                                ///////////////////////////////
+                                                                //描画ポジションがおかしくなったらここ要注意
+                                                                available_position = index + 1;
+                                                                ///////////////////////////////
+                                                                ///////////////////////////////
+                                                            }
+                                                        }
                                                         if (canvas_count < 6) {
-                                                            var new_canvas = canvases.Create(user_id, canvas_count);
+                                                            var new_canvas = canvases.Create(user_id, available_position);
                                                             document.getElementById("UserCanvasWrapper").appendChild(new_canvas);
-                                                            stage_dic[user_id] = new createjs.Stage(new_canvas);
+                                                            user_stage[user_id] = new createjs.Stage(new_canvas);
                                                             var _tachieLoader = new TachieLoader(command, new_canvas.width);
-                                                            stage_dic[user_id].addChild(_tachieLoader.getSkinImage(new_canvas.width));
-                                                            createjs.Ticker.on("tick", function () {
-                                                                stage_dic[user_id].update();
-                                                                console.log("tick");
-                                                            })
+                                                            user_stage[user_id].addChild(_tachieLoader.getSkinImage(new_canvas.width));
+                                                            Stage_update(user_stage[user_id]);
                                                         }
                                                     }
                                                     else {
                                                         var target_canvas = document.getElementById(user_id);
-                                                        stage_dic[user_id].removeChildAt(0);
-                                                        stage_dic[user_id] = new createjs.Stage(target_canvas);
+                                                        user_stage[user_id].removeChildAt(0);
+                                                        user_stage[user_id] = new createjs.Stage(target_canvas);
                                                         var _tachieLoader = new TachieLoader(command, target_canvas.width);
-                                                        stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
-                                                        //初回呼び出し時のtickerでupdateしておけば二度目はいらない？のでコメント化
-                                                        //createjs.Ticker.on("tick", function () {
-                                                        //    stage_dic[user_id].update();
-                                                        //})
+                                                        user_stage[user_id].addChild(_tachieLoader.getSkinImage());
+                                                        Stage_update(user_stage[user_id]);
                                                     }
                                                 }
                                             }
@@ -106,6 +126,17 @@
             window.addEventListener("load", init);
         }
 
+        function Stage_update(user_stage){
+            var tick = 0;
+            var Update_tick = createjs.Ticker.on("tick", function () {
+                user_stage.update();
+                console.log("stage update tick");
+                tick += 1;
+                if (tick > 48) {
+                    createjs.Ticker.off("tick", Update_tick);
+                }
+            })
+        }
     </script>
 </head>
 <body onload="init();">

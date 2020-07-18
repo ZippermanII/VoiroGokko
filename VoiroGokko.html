@@ -70,8 +70,8 @@
                                                             var new_canvas = canvases.Create(user_id, canvas_count);
                                                             document.getElementById("UserCanvasWrapper").appendChild(new_canvas);
                                                             stage_dic[user_id] = new createjs.Stage(new_canvas);
-                                                            var _tachieLoader = new TachieLoader(command);
-                                                            stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
+                                                            var _tachieLoader = new TachieLoader(command, new_canvas.width);
+                                                            stage_dic[user_id].addChild(_tachieLoader.getSkinImage(new_canvas.width));
                                                             createjs.Ticker.on("tick", function () {
                                                                 stage_dic[user_id].update();
                                                                 console.log("tick");
@@ -81,10 +81,8 @@
                                                     else {
                                                         var target_canvas = document.getElementById(user_id);
                                                         stage_dic[user_id].removeChildAt(0);
-                                                        target_canvas.width = 1920;
-                                                        target_canvas.height = 1080;
                                                         stage_dic[user_id] = new createjs.Stage(target_canvas);
-                                                        var _tachieLoader = new TachieLoader(command);
+                                                        var _tachieLoader = new TachieLoader(command, target_canvas.width);
                                                         stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
                                                         //初回呼び出し時のtickerでupdateしておけば二度目はいらない？のでコメント化
                                                         //createjs.Ticker.on("tick", function () {

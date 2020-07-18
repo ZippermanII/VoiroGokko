@@ -8,8 +8,6 @@ function TachieLoader(Command,canvas_width) {
     this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + command + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
         this.skinimage.image = new createjs.Bitmap(event.result).image;
-        console.log("canvas_width =  " + canvas_width);
-        console.log("skinimage.image.naturalWidth  " + this.skinimage.image.naturalWidth);
         scaling = canvas_width / this.skinimage.image.naturalWidth;
         this.skinimage.scaleX = scaling;
         this.skinimage.scaleY = scaling; 
