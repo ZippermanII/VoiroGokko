@@ -11,10 +11,9 @@
     <script src="VoiroGokko.js"></script>
     <script src="Canvases.js"></script>
     <script>
-
         var canvases = new Canvases;
-        var user_id = "123456789";
-        var stage_dic = {};
+        var userId = "123456789";
+        var userStage = {};
 
 
 
@@ -47,47 +46,46 @@
                                         ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
-                                        var user_id = xml[i].getAttributeNode("user_id").value;
-                                        console.log(user_id);
+                                        var userId = xml[i].getAttributeNode("user_id").value;
                                         var comment = "";
                                         comment = xml[i].firstChild.nodeValue;
-                                        console.log(comment);
-                                        //ニコ生のコメントからコマンドを取得
+                                        //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                         var baseCommandStart = comment.indexOf("[");
                                         var baseCommandEnd = comment.indexOf("]");
                                         if ((baseCommandStart != -1) && (baseCommandEnd != -1)) {
                                             if (baseCommandEnd - baseCommandStart - 1 > 0) {
                                                 var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
+                                                //コマンドを受けてキャラ絵を操作
                                                 if (command) {
+                                                    //キャラ絵を退出させるコマンド
                                                     if (command == "delete") {
-                                                        var target_canvas = document.getElementById(user_id);
-                                                        target_canvas.remove()
+                                                        var targetCanvas = document.getElementById(userId);
+                                                        targetCanvas.remove()
                                                     }
-                                                    else if (!document.getElementById(user_id)) {
-                                                        var canvas_count = document.getElementById("UserCanvasWrapper").children.length;
-                                                        console.log(canvas_count);
-                                                        if (canvas_count < 6) {
-                                                            var new_canvas = canvases.Create(user_id, canvas_count);
-                                                            document.getElementById("UserCanvasWrapper").appendChild(new_canvas);
-                                                            stage_dic[user_id] = new createjs.Stage(new_canvas);
-                                                            var _tachieLoader = new TachieLoader(command, new_canvas.width);
-                                                            stage_dic[user_id].addChild(_tachieLoader.getSkinImage(new_canvas.width));
-                                                            createjs.Ticker.on("tick", function () {
-                                                                stage_dic[user_id].update();
-                                                                console.log("tick");
-                                                            })
+                                                    //キャラ絵をまだ呼び出していない人
+                                                    else if (!document.getElementById(userId)) {
+                                                        var userCanvases = document.getElementById("UserCanvasWrapper").children;
+                                                        var canvasCount = userCanvases.length;
+                                                        // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
+                                                        var availablePosition = minimumNumberDitect(userCanvases);
+                                                        //キャラ絵最大表示数は6なのでそれ以上は弾く
+                                                        if (canvasCount < 6) {
+                                                            var newCanvas = canvases.create(userId, availablePosition);
+                                                            document.getElementById("UserCanvasWrapper").appendChild(newCanvas);
+                                                            userStage[userId] = new createjs.Stage(newCanvas);
+                                                            var _tachieLoader = new tachieLoader(command, newCanvas.width);
+                                                            userStage[userId].addChild(_tachieLoader.getSkinImage(newCanvas.width));
+                                                            stageUpdate(userStage[userId]);
                                                         }
                                                     }
+                                                    //キャラ絵を既に呼び出している人
                                                     else {
-                                                        var target_canvas = document.getElementById(user_id);
-                                                        stage_dic[user_id].removeChildAt(0);
-                                                        stage_dic[user_id] = new createjs.Stage(target_canvas);
-                                                        var _tachieLoader = new TachieLoader(command, target_canvas.width);
-                                                        stage_dic[user_id].addChild(_tachieLoader.getSkinImage());
-                                                        //初回呼び出し時のtickerでupdateしておけば二度目はいらない？のでコメント化
-                                                        //createjs.Ticker.on("tick", function () {
-                                                        //    stage_dic[user_id].update();
-                                                        //})
+                                                        var targetCanvas = document.getElementById(userId);
+                                                        userStage[userId].removeChildAt(0);
+                                                        userStage[userId] = new createjs.Stage(targetCanvas);
+                                                        var _tachieLoader = new tachieLoader(command, targetCanvas.width);
+                                                        userStage[userId].addChild(_tachieLoader.getSkinImage());
+                                                        stageUpdate(userStage[userId]);
                                                     }
                                                 }
                                             }
@@ -97,7 +95,7 @@
                                 }
                             },
                             error: function () {
-                                alert("commentlog.xmlロード失敗");
+                                alert("dummycommentlog.xmlロード失敗");
                             }
                         });
                     }
@@ -106,6 +104,49 @@
             window.addEventListener("load", init);
         }
 
+        function stageUpdate(userStage){
+            var tick = 0;
+            var updateTick = createjs.Ticker.on("tick", function () {
+                userStage.update();
+                console.log("stage update tick");
+                tick += 1;
+                if (tick > 48) {
+                    createjs.Ticker.off("tick", updateTick);
+                }
+            })
+        }
+
+        function minimumNumberDitect (userCanvases){     
+            var availablePosition = 0;       
+            var array = [];
+            for (var i = 0; i < 6; i++) {
+                if (userCanvases[i]) {
+                    array[i] = Number(userCanvases[i].getAttribute("data-position"));
+                }
+                else {
+                    break;
+                }
+            }
+            array.sort(function(a,b){
+                    if( a < b ) return -1;
+                    if( a > b ) return 1;
+                    return 0;
+            });
+            for (let index = 0; index < array.length; index++) {
+                if (array[index] != index) {
+                    availablePosition = index;
+                    break;
+                }
+                else{
+                    ///////////////////////////////
+                    //描画ポジションがおかしくなったらここ要注意
+                    availablePosition = index + 1;
+                    ///////////////////////////////
+                    ///////////////////////////////
+                }
+            }
+            return availablePosition;
+        }
     </script>
 </head>
 <body onload="init();">

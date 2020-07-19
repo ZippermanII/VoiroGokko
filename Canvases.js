@@ -6,6 +6,7 @@ class Canvases {
         this.layer = 10000;
     }
 
+    //左右反転しなくなった場合はここを要チェックlistに追加しなければならない要素がある可能性
     StyleDeclarationSetTransform(style, value) {
     var list = [
         "transform",
@@ -26,7 +27,7 @@ class Canvases {
 }
 
     //新規キャンバスを作成
-    Create(user_id, available_position) {
+    create(user_id, available_position) {
         var new_canvas = document.createElement("canvas");
         var style = new_canvas.style;
         new_canvas.setAttribute("data-position", available_position);
@@ -41,6 +42,7 @@ class Canvases {
         }
         else {
             new_canvas.style.left = "-90px";
+            //共通フォーマットが左向きなので画面右にくる画像は左右反転
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }
         var top = 0;

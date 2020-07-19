@@ -1,6 +1,6 @@
 ﻿// JavaScript source code
 
-function TachieLoader(Command,canvas_width) {
+function tachieLoader(Command,canvas_width) {
     //スキン初期設定
     var command = Command;
     var scaling = 1;
@@ -15,6 +15,6 @@ function TachieLoader(Command,canvas_width) {
     }).bind(this), false);//注意
     this.skinloader.load();//注意
 };
-TachieLoader.prototype.getSkinImage = function (width) {
+tachieLoader.prototype.getSkinImage = function (width) {
     return this.skinimage;
 };
