@@ -34,12 +34,9 @@ class DummyNicoliveCommentReceiver:
         base5 = '</chat>'
         # base6 = '" user_id="'
         # base7 = '" user_id="'
-        if input_str[0] is "0":
-            dummy_command = "[delete]"
-        else:
-            dummy_command = "[" +chr(96+int(input_str[0])) + "]"
+        dummy_command = "[" + input_str[1:] + "]"
         print(dummy_command)
-        dummy_id = str(int(input_str[1]) * 111111111111111111)
+        dummy_id = str(int(input_str[0]) * 111111111111111111)
         print(dummy_id)
         now = datetime.now()
         now_ts = int(now.timestamp())

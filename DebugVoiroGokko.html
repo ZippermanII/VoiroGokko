@@ -14,6 +14,8 @@
         var canvases = new Canvases;
         var userId = "123456789";
         var userStage = {};
+        var _tachieLoader = {};
+        var charaChange = false;
 
 
 
@@ -71,21 +73,34 @@
                                                         //キャラ絵最大表示数は6なのでそれ以上は弾く
                                                         if (canvasCount < 6) {
                                                             var newCanvas = canvases.create(userId, availablePosition);
+                                                            var dataTargetDirectory = command.slice(0,command.length - 3) + "/" + command.slice(-3);
+                                                            newCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
+                                                            fixedCommand = dataTargetDirectory + "/" + "000";
                                                             document.getElementById("UserCanvasWrapper").appendChild(newCanvas);
                                                             userStage[userId] = new createjs.Stage(newCanvas);
-                                                            var _tachieLoader = new tachieLoader(command, newCanvas.width);
-                                                            userStage[userId].addChild(_tachieLoader.getSkinImage(newCanvas.width));
+                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, newCanvas.width);
+                                                            userStage[userId].addChild(_tachieLoader[userStage[userId]].getSkinImage(newCanvas.width));
+                                                            for (let index = 0; index < 10; index++) {
+                                                            var _emptyImgLoader = new tachieLoader("empty", newCanvas.width);
+                                                            userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(newCanvas.width),1);
+                                                            }
+                                                            successLoadingCheck(newCanvas,_tachieLoader[userStage[userId]]);
                                                             stageUpdate(userStage[userId]);
+                                                            console.log(userStage[userId]);
                                                         }
                                                     }
                                                     //キャラ絵を既に呼び出している人
                                                     else {
+                                                        if (!charaChange) {
                                                         var targetCanvas = document.getElementById(userId);
-                                                        userStage[userId].removeChildAt(0);
-                                                        userStage[userId] = new createjs.Stage(targetCanvas);
-                                                        var _tachieLoader = new tachieLoader(command, targetCanvas.width);
-                                                        userStage[userId].addChild(_tachieLoader.getSkinImage());
+                                                        var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                        console.log(fixedCommand);
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),2);
                                                         stageUpdate(userStage[userId]);
+                                                        console.log(userStage[userId]);
+                                                        userStage[userId].removeChildAt(3);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -108,10 +123,23 @@
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 userStage.update();
-                console.log("stage update tick");
                 tick += 1;
                 if (tick > 48) {
                     createjs.Ticker.off("tick", updateTick);
+                }
+            })
+        }
+        function successLoadingCheck(canvas,_tachieLoader){
+            var tick = 0;
+            var updateTick = createjs.Ticker.on("tick", function () {
+                tick += 1;
+                if (_tachieLoader.success == true) {
+                    createjs.Ticker.off("tick", updateTick);
+                    return;
+                }
+                else if (tick > 49) {
+                    createjs.Ticker.off("tick", updateTick);
+                    canvas.remove();
                 }
             })
         }
