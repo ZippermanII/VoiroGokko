@@ -27,38 +27,38 @@ class Canvases {
 }
 
     //新規キャンバスを作成
-    create(user_id, available_position) {
-        var new_canvas = document.createElement("canvas");
-        var style = new_canvas.style;
-        new_canvas.setAttribute("data-position", available_position);
-        new_canvas.id = user_id;
-        new_canvas.width = 400;
-        new_canvas.height = 1080;
-        new_canvas.style.position = "absolute";
-        new_canvas.style.zIndex = 10000 - available_position;
+    create(userId, availablePosition) {
+        var newCanvas = document.createElement("canvas");
+        var style = newCanvas.style;
+        newCanvas.setAttribute("data-position", availablePosition);
+        newCanvas.id = userId;
+        newCanvas.width = 400;
+        newCanvas.height = 1080;
+        newCanvas.style.position = "absolute";
+        newCanvas.style.zIndex = 10000 - availablePosition;
         //ポジションにあわせて描画位置を調整
-        if (available_position % 2 == 1) {
-            new_canvas.style.left = "1600px";
+        if (availablePosition % 2 == 1) {
+            newCanvas.style.left = "1600px";
         }
         else {
-            new_canvas.style.left = "-90px";
+            newCanvas.style.left = "-90px";
             //共通フォーマットが左向きなので画面右にくる画像は左右反転
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }
         var top = 0;
-        if (available_position < 2) {
+        if (availablePosition < 2) {
             top += 600;
-            new_canvas.style.top = top + "px";
+            newCanvas.style.top = top + "px";
         }
-        else if (available_position < 4) {
+        else if (availablePosition < 4) {
             top += 300;
-            new_canvas.style.top = top + "px";
+            newCanvas.style.top = top + "px";
         }
         else {
             top -= 50;
-            new_canvas.style.top = top + "px";
+            newCanvas.style.top = top + "px";
         }
-        return new_canvas;
+        return newCanvas;
     }
 
     //キャンバスを削除

@@ -13,9 +13,10 @@
     <script>
         var canvases = new Canvases;
         var userId = "123456789";
-        var userStage = {};
+        var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
+        var maxChildIndex = 10;
 
 
 
@@ -60,46 +61,67 @@
                                                 //コマンドを受けてキャラ絵を操作
                                                 if (command) {
                                                     //キャラ絵を退出させるコマンド
-                                                    if (command == "delete") {
+                                                    if (command == "logout") {
                                                         var targetCanvas = document.getElementById(userId);
                                                         targetCanvas.remove()
                                                     }
                                                     //キャラ絵をまだ呼び出していない人
                                                     else if (!document.getElementById(userId)) {
+                                                            console.log("####################L69 userid = " + userId);
                                                         var userCanvases = document.getElementById("UserCanvasWrapper").children;
                                                         var canvasCount = userCanvases.length;
                                                         // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
                                                         var availablePosition = minimumNumberDitect(userCanvases);
                                                         //キャラ絵最大表示数は6なのでそれ以上は弾く
                                                         if (canvasCount < 6) {
-                                                            var newCanvas = canvases.create(userId, availablePosition);
+                                                            var targetCanvas = canvases.create(userId, availablePosition);
+                                                            //commandからディレクトリ指定文字列を生成
                                                             var dataTargetDirectory = command.slice(0,command.length - 3) + "/" + command.slice(-3);
-                                                            newCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
+                                                            targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                                                             fixedCommand = dataTargetDirectory + "/" + "000";
-                                                            document.getElementById("UserCanvasWrapper").appendChild(newCanvas);
-                                                            userStage[userId] = new createjs.Stage(newCanvas);
-                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, newCanvas.width);
-                                                            userStage[userId].addChild(_tachieLoader[userStage[userId]].getSkinImage(newCanvas.width));
-                                                            for (let index = 0; index < 10; index++) {
-                                                            var _emptyImgLoader = new tachieLoader("empty", newCanvas.width);
-                                                            userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(newCanvas.width),1);
-                                                            }
-                                                            successLoadingCheck(newCanvas,_tachieLoader[userStage[userId]]);
-                                                            stageUpdate(userStage[userId]);
+                                                            document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
+                                                            userStage[userId] = new createjs.Stage(targetCanvas);
+                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                            for (let index = 0; index < maxChildIndex; index++) {
+                                                                if (index == 10) {
+                                                                }
+                                                                else{
+                                                                    //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
+                                                                    var _emptyImgLoader = new tachieLoader("empty", targetCanvas.width);
+                                                                    userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
+                                                                }
+                                                            }                                                            
+                                                            userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),2);
+                                                            successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
                                                             console.log(userStage[userId]);
                                                         }
                                                     }
                                                     //キャラ絵を既に呼び出している人
                                                     else {
-                                                        if (!charaChange) {
-                                                        var targetCanvas = document.getElementById(userId);
-                                                        var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                        console.log(fixedCommand);
-                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),2);
-                                                        stageUpdate(userStage[userId]);
-                                                        console.log(userStage[userId]);
-                                                        userStage[userId].removeChildAt(3);
+                                                        //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
+                                                        if (Number(command) < 1000) {
+                                                            console.log("####################L101");
+                                                            var targetCanvas = document.getElementById(userId);
+                                                            var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                            console.log(fixedCommand);
+                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                            userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),4);
+                                                            stageUpdate(userStage[userId]);
+                                                            console.log(userStage[userId]);
+                                                            userStage[userId].removeChildAt(5);
+                                                        }
+                                                        else{
+                                                            console.log("####################L112");
+                                                            var targetCanvas = document.getElementById(userId);
+                                                            var targetStage = userStage[userId];
+                                                            var dataTargetDirectory = command.slice(0,command.length - 3) + "/" + command.slice(-3);
+                                                            fixedCommand = dataTargetDirectory + "/" + "000";
+                                                            console.log(fixedCommand);
+                                                            _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                            targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
+                                                            successLoadingCheck_B(targetCanvas,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
+                                                            console.log(targetStage);
+                                                            targetStage.removeChildAt(3);
                                                         }
                                                     }
                                                 }
@@ -119,27 +141,64 @@
             window.addEventListener("load", init);
         }
 
-        function stageUpdate(userStage){
+        function stageUpdate(targetStage){
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
-                userStage.update();
+                targetStage.update();
                 tick += 1;
                 if (tick > 48) {
                     createjs.Ticker.off("tick", updateTick);
                 }
             })
         }
-        function successLoadingCheck(canvas,_tachieLoader){
+
+        function successLoadingCheck_A(canvas,targetStage,_tachieLoader){
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
-                if (_tachieLoader.success == true) {
+                if (_tachieLoader.complete == true) {
+                    console.log("###############L160 o");
+                    targetStage.update();
+                    createjs.Ticker.off("tick", updateTick);
+                    return;
+                }
+                else if (tick > 49) {
+                    console.log("####################L165 x");
+                    createjs.Ticker.off("tick", updateTick);
+                    canvas.remove();
+                }
+            })
+        }
+
+        function successLoadingCheck_B(canvas,dataTargetDirectory,targetStage,_tachieLoader){
+            var tick = 0;
+            var updateTick = createjs.Ticker.on("tick", function () {
+                tick += 1;
+                if (_tachieLoader.complete == true) {
+                    createjs.Ticker.off("tick", updateTick);
+                    canvas.setAttribute("data-targetDirectory", dataTargetDirectory);
+                    let count = targetStage.numChildren;
+                    for (let index = 0; index < count - 1 ; index++) {
+                        console.log("");
+                        targetStage.removeChildAt(0);  
+                    }
+                    for (let index = 0; index < maxChildIndex; index++) {
+                        if (index < 2) {
+                        console.log("");
+                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),0); 
+                        }
+                        else if (index > 3) {
+                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),3); 
+                        }
+                    }
+                    targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
                     return;
                 }
                 else if (tick > 49) {
                     createjs.Ticker.off("tick", updateTick);
-                    canvas.remove();
                 }
             })
         }
