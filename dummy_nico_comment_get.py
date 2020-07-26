@@ -34,7 +34,7 @@ class DummyNicoliveCommentReceiver:
         base5 = '</chat>'
         # base6 = '" user_id="'
         # base7 = '" user_id="'
-        dummy_command = "[" + input_str[1:] + "]"
+        dummy_command = input_str[1:]
         print(dummy_command)
         dummy_id = str(int(input_str[0]) * 111111111111111111)
         print(dummy_id)

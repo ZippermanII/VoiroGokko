@@ -1,4 +1,4 @@
-﻿// JavaScript source code
+// JavaScript source code
 
 function tachieLoader(fixedCommand,canvasWidth) {
     //スキン初期設定

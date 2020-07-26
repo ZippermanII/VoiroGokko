@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -24,7 +24,6 @@
 
 
         function init() {
-
             var startTime = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
 
@@ -58,9 +57,13 @@
                                         //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                         var baseCommandStart = comment.indexOf("[");
                                         var baseCommandEnd = comment.indexOf("]");
+                                        var aaaaaaaaaaaaa = "";
+                                        talk(aaaaaaaaaaaaa);
                                         if ((baseCommandStart != -1) && (baseCommandEnd != -1)) {
                                             if (baseCommandEnd - baseCommandStart - 1 > 0) {
                                                 var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
+                                                aaaaaaaaaaaaa = comment.slice(0,baseCommandStart);
+                                                console.log(aaaaaaaaaaaaa);
                                                 var targetCanvas = document.getElementById(userId);
                                                 //コマンドを受けてキャラ絵を操作
                                                 if (command) {
@@ -117,6 +120,9 @@
                                                 }
                                             }
                                         }
+                                        else{
+                                            console.log(comment);
+                                        }
                                         break;
                                     }
                                 }
@@ -130,6 +136,34 @@
                 }
             }
             window.addEventListener("load", init);
+        }
+        
+        async function talk(str){
+            //VScodeで横長を解消する alt+z
+            const fetchopt = {
+                "mode":"cors",
+                "credentials":"include",
+                "headers":{},
+                "method":"POST",
+                "body":JSON.stringify({
+                    "talktext":"ｱｶﾈﾁｬﾝｶﾜｲｲﾔｯﾀｰ",
+                    "effects":{
+                        "volume":1,
+                        "speed":1,
+                        "pitch":1,
+                        "intonation":1,
+                        "shortpause":150,
+                        "longpause":370
+                    },
+                    "emotions":{
+                        "喜び":0,
+                        "怒り":0,
+                        "悲しみ":0
+                    }
+                })
+            };
+            const res = await fetch("http://localhost:7180/PLAY2/2001", fetchopt);
+            // const json = await res.json();
         }
 
         function stageUpdate(targetStage){

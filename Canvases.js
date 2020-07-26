@@ -1,4 +1,4 @@
-﻿// JavaScript source code
+// JavaScript source code
 
 class Canvases {
 
