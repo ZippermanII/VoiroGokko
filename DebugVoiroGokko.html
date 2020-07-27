@@ -20,7 +20,11 @@
         var tachieBaseLayer = 2;
         var tachieEmotionLayer = 4;
         var tachieBlinkLayer = 5;
-
+        var speaker = {
+            "akane":"2000",
+            "aoi":"2001",
+            "kiritan":"2002"
+        };
 
 
         function init() {
@@ -52,23 +56,26 @@
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
                                         var userId = xml[i].getAttributeNode("user_id").value;
+                                        var targetCanvas = document.getElementById(userId);
                                         var comment = "";
                                         comment = xml[i].firstChild.nodeValue;
                                         //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                         var baseCommandStart = comment.indexOf("[");
                                         var baseCommandEnd = comment.indexOf("]");
-                                        var aaaaaaaaaaaaa = "";
-                                        talk(aaaaaaaaaaaaa);
+                                        var talkStr = "";
+                                        var speakerName = "";
+                                        // var speakerNum = "";
                                         if ((baseCommandStart != -1) && (baseCommandEnd != -1)) {
                                             if (baseCommandEnd - baseCommandStart - 1 > 0) {
                                                 var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
-                                                aaaaaaaaaaaaa = comment.slice(0,baseCommandStart);
-                                                console.log(aaaaaaaaaaaaa);
-                                                var targetCanvas = document.getElementById(userId);
+                                                talkStr = comment.slice(0,baseCommandStart);
+                                                console.log(talkStr);
                                                 //コマンドを受けてキャラ絵を操作
                                                 if (command) {
                                                     //キャラ絵を退出させるコマンド
                                                     if (command == "logout") {
+                                                        speakerName = targetCanvas.getAttribute("data-speakerName");
+                                                        talk(talkStr,speaker[speakerName]);
                                                         targetCanvas.remove();
                                                     }
                                                     //キャラ絵をまだ呼び出していない人
@@ -81,7 +88,11 @@
                                                         if (canvasCount < 6) {
                                                             targetCanvas = canvases.create(userId, availablePosition);
                                                             //commandからディレクトリ指定文字列を生成
-                                                            var dataTargetDirectory = command.slice(0,command.length - 3) + "/" + command.slice(-3);
+                                                            speakerName = command.slice(0,command.length - 3);
+                                                            speakerNum = speaker[speakerName];
+                                                            if (speakerNum) {
+                                                            targetCanvas.setAttribute("data-speakerName", speakerName);
+                                                            var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                             targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                                                             fixedCommand = dataTargetDirectory + "/" + "000";
                                                             document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
@@ -94,6 +105,8 @@
                                                             }                                                            
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
                                                             successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
+                                                            talk(talkStr,speaker[speakerName]);
+                                                            }
                                                         }
                                                     }
                                                     //キャラ絵を既に呼び出している人
@@ -101,26 +114,34 @@
                                                         //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
                                                         if (Number(command) < 1000) {
                                                             var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                            speakerName = targetCanvas.getAttribute("data-speakerName");
                                                             _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                             stageUpdate(userStage[userId]);
                                                             userStage[userId].removeChildAt(tachieEmotionLayer +1);
                                                             console.log(userStage[userId]);
+                                                            talk(talkStr,speaker[speakerName]);
                                                         }
                                                         else{
                                                             var targetStage = userStage[userId];
-                                                            var dataTargetDirectory = command.slice(0,command.length - 3) + "/" + command.slice(-3);
+                                                            speakerName = command.slice(0,command.length - 3);
+                                                            speakerNum = speaker[speakerName];
+                                                            targetCanvas.setAttribute("data-speakerName", speakerName);
+                                                            var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                             fixedCommand = dataTargetDirectory + "/" + "000";
                                                             _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
                                                             targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
                                                             successLoadingCheck_B(targetCanvas,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
                                                             targetStage.removeChildAt(tachieBaseLayer + 1);
+                                                            talk(talkStr,speaker[speakerName]);
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                         else{
+                                            speakerName = targetCanvas.getAttribute("data-speakerName");
+                                            talk(comment,speaker[speakerName]);
                                             console.log(comment);
                                         }
                                         break;
@@ -138,31 +159,31 @@
             window.addEventListener("load", init);
         }
         
-        async function talk(str){
+        async function talk(str,speakerNum){
             //VScodeで横長を解消する alt+z
             const fetchopt = {
-                "mode":"cors",
+                "mode":"no-cors",
                 "credentials":"include",
                 "headers":{},
                 "method":"POST",
                 "body":JSON.stringify({
-                    "talktext":"ｱｶﾈﾁｬﾝｶﾜｲｲﾔｯﾀｰ",
+                    "talktext":str,
                     "effects":{
-                        "volume":1,
+                        "volume":0.7,
                         "speed":1,
                         "pitch":1,
                         "intonation":1,
-                        "shortpause":150,
-                        "longpause":370
+                        // "shortpause":150,
+                        // "longpause":370
                     },
-                    "emotions":{
-                        "喜び":0,
-                        "怒り":0,
-                        "悲しみ":0
-                    }
-                })
+                    // "emotions":{
+                    //     "喜び":0,
+                    //     "怒り":0,
+                    //     "悲しみ":0
+                    // }
+                }),
             };
-            const res = await fetch("http://localhost:7180/PLAY2/2001", fetchopt);
+            const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
         }
 
@@ -224,7 +245,7 @@
             })
         }
 
-        function minimumNumberDitect (userCanvases){     
+        function minimumNumberDitect (userCanvases){      
             var availablePosition = 0;       
             var array = [];
             for (var i = 0; i < 6; i++) {
@@ -255,6 +276,7 @@
             }
             return availablePosition;
         }
+
     </script>
 </head>
 <body onload="init();">
