@@ -16,6 +16,7 @@
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
+        var maxUserCanvas = 6;
         var maxChildIndex = 10;
         var tachieBaseLayer = 2;
         var tachieEmotionLayer = 4;
@@ -74,8 +75,7 @@
                                                 if (command) {
                                                     //キャラ絵を退出させるコマンド
                                                     if (command == "logout") {
-                                                        speakerName = targetCanvas.getAttribute("data-speakerName");
-                                                        talk(talkStr,speaker[speakerName]);
+                                                        talk(talkStr,targetCanvas);
                                                         targetCanvas.remove();
                                                     }
                                                     //キャラ絵をまだ呼び出していない人
@@ -84,12 +84,11 @@
                                                         var canvasCount = userCanvases.length;
                                                         // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
                                                         var availablePosition = minimumNumberDitect(userCanvases);
-                                                        //キャラ絵最大表示数は6なのでそれ未満なら新規キャンバス生成
-                                                        if (canvasCount < 6) {
+                                                        if (canvasCount < maxUserCanvas) {
                                                             targetCanvas = canvases.create(userId, availablePosition);
                                                             //commandからディレクトリ指定文字列を生成
                                                             speakerName = command.slice(0,command.length - 3);
-                                                            speakerNum = speaker[speakerName];
+                                                            var speakerNum = speaker[speakerName]
                                                             if (speakerNum) {
                                                             targetCanvas.setAttribute("data-speakerName", speakerName);
                                                             var dataTargetDirectory = speakerName + "/" + command.slice(-3);
@@ -105,7 +104,7 @@
                                                             }                                                            
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
                                                             successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
-                                                            talk(talkStr,speaker[speakerName]);
+                                                            talk(talkStr,targetCanvas);
                                                             }
                                                         }
                                                     }
@@ -114,34 +113,35 @@
                                                         //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
                                                         if (Number(command) < 1000) {
                                                             var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                            speakerName = targetCanvas.getAttribute("data-speakerName");
                                                             _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                             stageUpdate(userStage[userId]);
                                                             userStage[userId].removeChildAt(tachieEmotionLayer +1);
                                                             console.log(userStage[userId]);
-                                                            talk(talkStr,speaker[speakerName]);
+                                                            talk(talkStr,targetCanvas);
                                                         }
                                                         else{
                                                             var targetStage = userStage[userId];
                                                             speakerName = command.slice(0,command.length - 3);
-                                                            speakerNum = speaker[speakerName];
-                                                            targetCanvas.setAttribute("data-speakerName", speakerName);
                                                             var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                             fixedCommand = dataTargetDirectory + "/" + "000";
                                                             _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
                                                             targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
-                                                            successLoadingCheck_B(targetCanvas,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
+                                                            successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
                                                             targetStage.removeChildAt(tachieBaseLayer + 1);
-                                                            talk(talkStr,speaker[speakerName]);
                                                         }
                                                     }
                                                 }
+                                                else{
+                                                    talk(talkStr,targetCanvas);
+                                                }
+                                            }
+                                            else{
+                                                talk(talkStr,targetCanvas);
                                             }
                                         }
                                         else{
-                                            speakerName = targetCanvas.getAttribute("data-speakerName");
-                                            talk(comment,speaker[speakerName]);
+                                            talk(comment,targetCanvas);
                                             console.log(comment);
                                         }
                                         break;
@@ -159,7 +159,14 @@
             window.addEventListener("load", init);
         }
         
-        async function talk(str,speakerNum){
+        async function talk(str,targetCanvas){
+            if (targetCanvas) {
+                speakerName = targetCanvas.getAttribute("data-speakerName");
+                var speakerNum = speaker[speakerName];
+            }
+            else{
+                var speakerNum = "4000";
+            }
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
@@ -214,12 +221,13 @@
             })
         }
 
-        function successLoadingCheck_B(canvas,dataTargetDirectory,targetStage,_tachieLoader){
+        function successLoadingCheck_B(talkStr,canvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader){
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
                 if (_tachieLoader.complete == true) {
                     createjs.Ticker.off("tick", updateTick);
+                    canvas.setAttribute("data-speakerName", speakerName);
                     canvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                     let count = targetStage.numChildren;
                     for (let index = 0; index < count - 1 ; index++) {
@@ -237,10 +245,12 @@
                     }
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
+                    talk(talkStr,canvas);
                     return;
                 }
                 else if (tick > 49) {
                     createjs.Ticker.off("tick", updateTick);
+                    talk(talkStr,canvas);
                 }
             })
         }
