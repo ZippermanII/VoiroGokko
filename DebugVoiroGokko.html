@@ -81,7 +81,7 @@
                                                 if (true) { 
                                                     //キャラ絵を退出させるコマンド
                                                     if (command == "logout") {
-                                                        talk(talkStr,speakerNum);
+                                                        talk(talkStr,speakerNum,targetCanvas);
                                                         targetCanvas.remove();
                                                     }
                                                     //キャラ絵をまだ呼び出していない人
@@ -110,11 +110,11 @@
                                                             }                                                            
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
                                                             successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
-                                                            talk(talkStr,speakerNum);
+                                                            talk(talkStr,speakerNum,targetCanvas);
                                                             }
                                                             else{
                                                                 console.log(talkStr);
-                                                                talk(talkStr,null);
+                                                                talk(talkStr,null,targetCanvas);
                                                             }
                                                         }
                                                     }
@@ -127,7 +127,7 @@
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                             stageUpdate(userStage[userId]);
                                                             userStage[userId].removeChildAt(tachieEmotionLayer +1);
-                                                            talk(talkStr,speakerNum);
+                                                            talk(talkStr,speakerNum,targetCanvas);
                                                         }
                                                         else{
                                                             var targetStage = userStage[userId];
@@ -142,15 +142,15 @@
                                                     }
                                                 }
                                                 else{
-                                                    talk(talkStr,speakerNum);
+                                                    talk(talkStr,speakerNum,targetCanvas);
                                                 }
                                             }
                                             else{
-                                                talk(talkStr,speakerNum);
+                                                talk(talkStr,speakerNum,targetCanvas);
                                             }
                                         }
                                         else{
-                                            talk(comment,speakerNum);
+                                            talk(comment,speakerNum,targetCanvas);
                                         }
                                         break;
                                     }
@@ -167,27 +167,20 @@
             window.addEventListener("load", init);
         }
 
-        function getJSON(){
-            $.getJSON('http://localhost/ignore/talker_effects.json', (data) => {
-                effectsJSON = data;
-            });
-            $.getJSON('http://localhost/ignore/talker_emotions.json', (data) => {
-                emotionsJSON = data;
-            });
+        async function getJSON(){
+            talkerEffectsJSON = await fetch('http://localhost/ignore/talker_effects.json',{"method":"GET"});
+            effectsJSON = await talkerEffectsJSON.json();
+            talkerEmotionsJSON = await fetch('http://localhost/ignore/talker_emotions.json',{"method":"GET"});
+            emotionsJSON = await talkerEmotionsJSON.json();
         }
         
-        async function talk(str,speakerNum){
+        async function talk(str,speakerNum,targetCanvas){
             console.log(effectsJSON);
             console.log(effectsJSON[String(speakerNum)]);
             if (str == "") {
                 console.log(str);
                 return;
             }
-            // var eff = {
-            //     "volume":0.7,
-            //     "speed":1,
-            //     "pitch":1.4
-            // }
             console.log("inside talk func");
             //VScodeで横長を解消する alt+z
             const fetchopt = {
@@ -201,8 +194,36 @@
                     "emotions":emotionsJSON[speakerNum]
                 }),
             };
+            speakEffect(targetCanvas);
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
+        }
+
+        function sleep(msec) {
+            return new Promise(function(resolve) {
+            
+                setTimeout(function() {resolve()}, msec);
+            
+            })
+        }
+
+        async function speakEffect(targetCanvas){
+            var t = parseInt(targetCanvas.style.top);
+            var transform = targetCanvas.style.transform;
+            var bar = transform.match(/\d+/);
+            console.log(bar);
+            for (let index = 0; index < 20; index++) {
+                t -= 7;
+                targetCanvas.style.top = String(t) + "px";
+                // targetCanvas.style.transform.scale.x = String(t) + "px";
+                await sleep(1);
+            }
+            for (let index = 0; index < 20; index++) {
+                t += 7;
+                targetCanvas.style.top = String(t) + "px";
+                await sleep(1);
+            }
+            // targetCanvas.style.top = "600px";
         }
 
         function stageUpdate(targetStage){
@@ -257,14 +278,14 @@
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
                     var speakerNum = speaker[speakerName];
-                    talk(talkStr,speakerNum);
+                    talk(talkStr,speakerNum,canvas);
                     return;
                 }
                 else if (tick > 49) {
                     createjs.Ticker.off("tick", updateTick);
                     speakerName = canvas.getAttribute("data-speakerName");
                     var speakerNum = speaker[speakerName];
-                    talk(talkStr,speakerNum);
+                    talk(talkStr,speakerNum,canvas);
                 }
             })
         }
