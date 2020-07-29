@@ -16,6 +16,7 @@
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
+        var startNo = 0;
         var maxUserCanvas = 6;
         var maxChildIndex = 10;
         var tachieBaseLayer = 2;
@@ -24,11 +25,16 @@
         var speaker = {
             "akane":"2000",
             "aoi":"2001",
-            "kiritan":"2002"
+            "yukari":"2003",
+            "kiritan":"2002",
+            "bouyomi":"4000"
         };
+        var effectsJSON = {};
+        var emotionsJSON = {};
 
 
         function init() {
+            getJSON();
             var startTime = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
 
@@ -57,25 +63,25 @@
                                         startTime = xml[i].getAttributeNode("date").value;
                                         startNo = xml[i].getAttributeNode("no").value;
                                         var userId = xml[i].getAttributeNode("user_id").value;
-                                        var targetCanvas = document.getElementById(userId);
                                         var comment = "";
                                         comment = xml[i].firstChild.nodeValue;
                                         //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
-                                        var baseCommandStart = comment.indexOf("[");
-                                        var baseCommandEnd = comment.indexOf("]");
-                                        var talkStr = "";
-                                        var speakerName = "";
-                                        // var speakerNum = "";
-                                        if ((baseCommandStart != -1) && (baseCommandEnd != -1)) {
-                                            if (baseCommandEnd - baseCommandStart - 1 > 0) {
-                                                var command = comment.substr(baseCommandStart + 1, baseCommandEnd - baseCommandStart - 1);
-                                                talkStr = comment.slice(0,baseCommandStart);
-                                                console.log(talkStr);
+                                        var baseCommandStart = comment.lastIndexOf("##");
+                                        var talkStr = comment.slice(0,baseCommandStart);
+                                        var targetCanvas = document.getElementById(userId);
+                                        var speakerName = "bouyomi";
+                                        if (targetCanvas) {
+                                            speakerName = targetCanvas.getAttribute('data-speakerName');
+                                        }
+                                        var speakerNum = speaker[speakerName];
+                                        if (baseCommandStart != -1) {
+                                            var command = comment.slice(baseCommandStart + 2 , comment.length);
+                                            if (command != "") {
                                                 //コマンドを受けてキャラ絵を操作
-                                                if (command) {
+                                                if (true) { 
                                                     //キャラ絵を退出させるコマンド
                                                     if (command == "logout") {
-                                                        talk(talkStr,targetCanvas);
+                                                        talk(talkStr,speakerNum);
                                                         targetCanvas.remove();
                                                     }
                                                     //キャラ絵をまだ呼び出していない人
@@ -104,7 +110,11 @@
                                                             }                                                            
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
                                                             successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
-                                                            talk(talkStr,targetCanvas);
+                                                            talk(talkStr,speakerNum);
+                                                            }
+                                                            else{
+                                                                console.log(talkStr);
+                                                                talk(talkStr,null);
                                                             }
                                                         }
                                                     }
@@ -117,8 +127,7 @@
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                             stageUpdate(userStage[userId]);
                                                             userStage[userId].removeChildAt(tachieEmotionLayer +1);
-                                                            console.log(userStage[userId]);
-                                                            talk(talkStr,targetCanvas);
+                                                            talk(talkStr,speakerNum);
                                                         }
                                                         else{
                                                             var targetStage = userStage[userId];
@@ -133,16 +142,15 @@
                                                     }
                                                 }
                                                 else{
-                                                    talk(talkStr,targetCanvas);
+                                                    talk(talkStr,speakerNum);
                                                 }
                                             }
                                             else{
-                                                talk(talkStr,targetCanvas);
+                                                talk(talkStr,speakerNum);
                                             }
                                         }
                                         else{
-                                            talk(comment,targetCanvas);
-                                            console.log(comment);
+                                            talk(comment,speakerNum);
                                         }
                                         break;
                                     }
@@ -158,15 +166,29 @@
             }
             window.addEventListener("load", init);
         }
+
+        function getJSON(){
+            $.getJSON('http://localhost/ignore/talker_effects.json', (data) => {
+                effectsJSON = data;
+            });
+            $.getJSON('http://localhost/ignore/talker_emotions.json', (data) => {
+                emotionsJSON = data;
+            });
+        }
         
-        async function talk(str,targetCanvas){
-            if (targetCanvas) {
-                speakerName = targetCanvas.getAttribute("data-speakerName");
-                var speakerNum = speaker[speakerName];
+        async function talk(str,speakerNum){
+            console.log(effectsJSON);
+            console.log(effectsJSON[String(speakerNum)]);
+            if (str == "") {
+                console.log(str);
+                return;
             }
-            else{
-                var speakerNum = "4000";
-            }
+            // var eff = {
+            //     "volume":0.7,
+            //     "speed":1,
+            //     "pitch":1.4
+            // }
+            console.log("inside talk func");
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
@@ -175,19 +197,8 @@
                 "method":"POST",
                 "body":JSON.stringify({
                     "talktext":str,
-                    "effects":{
-                        "volume":0.7,
-                        "speed":1,
-                        "pitch":1,
-                        "intonation":1,
-                        // "shortpause":150,
-                        // "longpause":370
-                    },
-                    // "emotions":{
-                    //     "喜び":0,
-                    //     "怒り":0,
-                    //     "悲しみ":0
-                    // }
+                    "effects":effectsJSON[speakerNum],
+                    "emotions":emotionsJSON[speakerNum]
                 }),
             };
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
@@ -245,12 +256,15 @@
                     }
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
-                    talk(talkStr,canvas);
+                    var speakerNum = speaker[speakerName];
+                    talk(talkStr,speakerNum);
                     return;
                 }
                 else if (tick > 49) {
                     createjs.Ticker.off("tick", updateTick);
-                    talk(talkStr,canvas);
+                    speakerName = canvas.getAttribute("data-speakerName");
+                    var speakerNum = speaker[speakerName];
+                    talk(talkStr,speakerNum);
                 }
             })
         }
