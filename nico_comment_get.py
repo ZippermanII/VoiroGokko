@@ -10,6 +10,7 @@ from datetime import datetime
 from xml.dom import minidom
 import sys
 import xml.etree.ElementTree as ET
+import pprint
 
 #os.system('PAUSE')
 # 放送のIDをいれる
@@ -25,6 +26,7 @@ class NicoliveCommentReceiver:
         html = urllib.request.urlopen(self.community_URL).read().decode('utf-8')
         m = re.search('watch/(lv[0-9]+)', html)
         if m is None:
+            os.system('PAUSE')
             return None
         else:
             return m.group(1)

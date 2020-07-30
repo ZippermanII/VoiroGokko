@@ -11,6 +11,7 @@
     <script src="VoiroGokko.js"></script>
     <script src="Canvases.js"></script>
     <script>
+        var xmlFileName = "dummycommentlog.xml";
         var canvases = new Canvases;
         var userId = "123456789";
         var userStage  = {};
@@ -35,9 +36,12 @@
 
         function init() {
             getJSON();
+            var thisHtmlName = window.location.href.split('/').pop();
+            if (thisHtmlName == "VoiroGokko.html") {
+                xmlFileName = "commentlog.xml";
+            }
             var startTime = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
-
             function CommentFunc() {
                 if (true) {
                     //XML読み込み
@@ -50,7 +54,7 @@
                     });
                     function parse(type) {
                         $.ajax({
-                            url: 'http://localhost/ignore/dummycommentlog.xml',
+                            url: 'http://localhost/ignore/' + xmlFileName,
                             type: 'GET',
                             dataType: 'xml',
                             cache: false,
@@ -76,26 +80,25 @@
                                         var speakerNum = speaker[speakerName];
                                         if (baseCommandStart != -1) {
                                             var command = comment.slice(baseCommandStart + 2 , comment.length);
+                                            //コマンドを受けてキャラ絵を操作
                                             if (command != "") {
-                                                //コマンドを受けてキャラ絵を操作
-                                                if (true) { 
-                                                    //キャラ絵を退出させるコマンド
-                                                    if (command == "logout") {
-                                                        talk(talkStr,speakerNum,targetCanvas);
-                                                        targetCanvas.remove();
-                                                    }
-                                                    //キャラ絵をまだ呼び出していない人
-                                                    else if (!targetCanvas) {
-                                                        var userCanvases = document.getElementById("UserCanvasWrapper").children;
-                                                        var canvasCount = userCanvases.length;
-                                                        // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
-                                                        var availablePosition = minimumNumberDitect(userCanvases);
-                                                        if (canvasCount < maxUserCanvas) {
-                                                            targetCanvas = canvases.create(userId, availablePosition);
-                                                            //commandからディレクトリ指定文字列を生成
-                                                            speakerName = command.slice(0,command.length - 3);
-                                                            var speakerNum = speaker[speakerName]
-                                                            if (speakerNum) {
+                                                //キャラ絵を退出させるコマンド
+                                                if (command == "logout") {
+                                                    talk(talkStr,speakerNum,targetCanvas);
+                                                    targetCanvas.remove();
+                                                }
+                                                //キャラ絵をまだ呼び出していない人
+                                                else if (!targetCanvas) {
+                                                    var userCanvases = document.getElementById("UserCanvasWrapper").children;
+                                                    var canvasCount = userCanvases.length;
+                                                    // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
+                                                    var availablePosition = minimumNumberDitect(userCanvases);
+                                                    if (canvasCount < maxUserCanvas) {
+                                                        targetCanvas = canvases.create(userId, availablePosition);
+                                                        //commandからディレクトリ指定文字列を生成
+                                                        speakerName = command.slice(0,command.length - 3);
+                                                        var speakerNum = speaker[speakerName]
+                                                        if (speakerNum) {
                                                             targetCanvas.setAttribute("data-speakerName", speakerName);
                                                             var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                             targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
@@ -111,38 +114,34 @@
                                                             userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
                                                             successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
                                                             talk(talkStr,speakerNum,targetCanvas);
-                                                            }
-                                                            else{
-                                                                console.log(talkStr);
-                                                                talk(talkStr,null,targetCanvas);
-                                                            }
-                                                        }
-                                                    }
-                                                    //キャラ絵を既に呼び出している人
-                                                    else {
-                                                        //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
-                                                        if (Number(command) < 1000) {
-                                                            var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                            userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
-                                                            stageUpdate(userStage[userId]);
-                                                            userStage[userId].removeChildAt(tachieEmotionLayer +1);
-                                                            talk(talkStr,speakerNum,targetCanvas);
                                                         }
                                                         else{
-                                                            var targetStage = userStage[userId];
-                                                            speakerName = command.slice(0,command.length - 3);
-                                                            var dataTargetDirectory = speakerName + "/" + command.slice(-3);
-                                                            fixedCommand = dataTargetDirectory + "/" + "000";
-                                                            _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                            targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
-                                                            successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
-                                                            targetStage.removeChildAt(tachieBaseLayer + 1);
+                                                            console.log(talkStr);
+                                                            talk(talkStr,'4000',targetCanvas);
                                                         }
                                                     }
                                                 }
-                                                else{
-                                                    talk(talkStr,speakerNum,targetCanvas);
+                                                //キャラ絵を既に呼び出している人
+                                                else {
+                                                    //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
+                                                    if (Number(command) < 1000) {
+                                                        var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
+                                                        stageUpdate(userStage[userId]);
+                                                        userStage[userId].removeChildAt(tachieEmotionLayer +1);
+                                                        talk(talkStr,speakerNum,targetCanvas);
+                                                    }
+                                                    else{
+                                                        var targetStage = userStage[userId];
+                                                        speakerName = command.slice(0,command.length - 3);
+                                                        var dataTargetDirectory = speakerName + "/" + command.slice(-3);
+                                                        fixedCommand = dataTargetDirectory + "/" + "000";
+                                                        _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                        targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
+                                                        successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
+                                                        targetStage.removeChildAt(tachieBaseLayer + 1);
+                                                    }
                                                 }
                                             }
                                             else{
@@ -213,17 +212,15 @@
             var bar = transform.match(/\d+/);
             console.log(bar);
             for (let index = 0; index < 20; index++) {
-                t -= 7;
+                t -= 6;
                 targetCanvas.style.top = String(t) + "px";
-                // targetCanvas.style.transform.scale.x = String(t) + "px";
                 await sleep(1);
             }
             for (let index = 0; index < 20; index++) {
-                t += 7;
+                t += 6;
                 targetCanvas.style.top = String(t) + "px";
                 await sleep(1);
             }
-            // targetCanvas.style.top = "600px";
         }
 
         function stageUpdate(targetStage){
