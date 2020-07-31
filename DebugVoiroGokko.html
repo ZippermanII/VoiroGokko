@@ -37,22 +37,21 @@
 
 
         function init() {
-                
+            getJSON();
             var subtitlesStage = new createjs.Stage("subtitleCanvas");
             createjs.Ticker.addEventListener('tick', mainLoop);
             function mainLoop() {
-                console.log("############subtitlesStageupdate");
                 subtitlesStage.update();
-            }
-    
-
-            getJSON();
+            } 
             var thisHtmlName = window.location.href.split('/').pop();
             if (thisHtmlName == "VoiroGokko.html") {
                 xmlFileName = "commentlog.xml";
             }
+
             var startTime = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
+
+
             function CommentFunc() {
                 if (true) {
                     //XML読み込み
@@ -71,11 +70,13 @@
                             cache: false,
                             timeout: 5000,
                             success: function (xml) {
-                                //////////////////////////////////////////////////////////////////////
-                                ////////この辺に前の読み上げが終わるまでの一時停止処理を入れたい！！////////
-                                ///////////////////////////201行目要チェック////////////////////////////
                                 xml = xml.getElementsByTagName('chat');
                                 for (var i = 0; i < xml.length; i++) {
+                                    //読み上げ中は処理に侵入させない
+                                    if (isSpeaking) {
+                                        break;
+                                    }
+                                    isSpeaking = true;
                                     if ((startTime < xml[i].getAttributeNode("date").value) ||
                                         ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                         startTime = xml[i].getAttributeNode("date").value;
@@ -173,6 +174,7 @@
                                         }
                                         break;
                                     }
+                                    isSpeaking = false;
                                 }
                             },
                             error: function () {
@@ -195,17 +197,11 @@
         
         async function talk(str,speakerNum,targetCanvas,subtitlesStage){
             if (str == "") {
-                console.log(str);
                 return;
-            }
-            //ここに一時停止で一見うまくいきそうだが読み上げの順番が狂う75行目あたりが望ましい。
-            while (isSpeaking) {
-                await sleep(100);
             }
             var SubGen = new Subtitles(str,targetCanvas);
             subtitlesStage.addChild(SubGen.getEdgeCommentText());
             subtitlesStage.addChild(SubGen.getCommentText());
-            console.log("inside talk func");
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
@@ -219,7 +215,6 @@
                 }),
             };
             speakEffect(targetCanvas);
-            isSpeaking = true;
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
             isSpeaking = false;
@@ -241,8 +236,6 @@
             }
             var t = parseInt(targetCanvas.style.top);
             var transform = targetCanvas.style.transform;
-            var bar = transform.match(/\d+/);
-            console.log(bar);
             for (let index = 0; index < 20; index++) {
                 t -= 6;
                 targetCanvas.style.top = String(t) + "px";
