@@ -39,6 +39,13 @@
             "kiritan":"2002",
             "bouyomi":"4000"
         };
+        var txtEdgeColor ={
+            "2000":"ff80d5",
+            "2001":"80bfff",
+            "2003":"b99ee8",
+            "2002":"800000",
+            "4000":"000000"
+        };
         var isSpeaking = false;
         var effectsJSON = {};
         var emotionsJSON = {};
@@ -63,7 +70,7 @@
             function CommentFunc() {
                 //読み上げ中は処理に侵入させない
                 if(isSpeaking){
-                    console.log("L57 return　by isSpeaking");
+                    console.log("#### return　by isSpeaking");
                     return;
                 }
                 //XML読み込み
@@ -102,13 +109,13 @@
                                     }
                                     var speakerNum = speaker[speakerName];
                                     if (baseCommandStart != -1) {                                        
-                                        console.log("L97    baseCommandStart != -1");
+                                        console.log("####  baseCommandStart != -1");
                                         var command = comment.slice(baseCommandStart + 2 , comment.length);
                                         //コマンドを受けてキャラ絵を操作
                                         if (command != "") {
                                             //キャラ絵を退出させるコマンド
                                             if (command == "logout") {
-                                                console.log("L103    logout");
+                                                console.log("####    logout");
                                                 talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                                 targetCanvas.remove();
                                             }
@@ -153,7 +160,7 @@
                                             else {
                                                 //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
                                                 if (Number(command) < 1000) {
-                                                    console.log("L151    number(commmand) < 1000");
+                                                    console.log("####    number(commmand) < 1000");
                                                     var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
                                                     _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
@@ -162,7 +169,7 @@
                                                     talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                                 }
                                                 else{
-                                                    console.log("L160  !number(command) < 1000 ");
+                                                    console.log("####  !number(command) < 1000 ");
                                                     var targetStage = userStage[userId];
                                                     speakerName = command.slice(0,command.length - 3);
                                                     var dataTargetDirectory = speakerName + "/" + command.slice(-3);
@@ -175,12 +182,12 @@
                                             }
                                         }
                                         else{
-                                            console.log("L173    command type error");
+                                            console.log("####    command type error");
                                             talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                         }
                                     }
                                     else{
-                                        console.log("L178    no command");
+                                        console.log("####    no command");
                                         talk(comment,speakerNum,targetCanvas,subtitlesStage);
                                     }
                                     break;
@@ -201,7 +208,7 @@
         }
 
         async function getJSON(){
-            console.log("L198     async func getJSON");
+            console.log("####     async func getJSON");
             talkerEffectsJSON = await fetch('http://localhost/ignore/talker_effects.json',{"method":"GET"});
             effectsJSON = await talkerEffectsJSON.json();
             talkerEmotionsJSON = await fetch('http://localhost/ignore/talker_emotions.json',{"method":"GET"});
@@ -209,12 +216,12 @@
         }
         
         async function talk(str,speakerNum,targetCanvas,subtitlesStage){         
-            console.log("L206    async func talk  ");
+            console.log("####    async func talk  ");
             if (str == "") {                
                 isSpeaking = false;
                 return;
             }
-            var SubGen = new Subtitles(str,targetCanvas);
+            var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
             subtitlesStage.addChild(SubGen.getEdgeCommentText());
             subtitlesStage.addChild(SubGen.getCommentText());
             //VScodeで横長を解消する alt+z
@@ -238,7 +245,7 @@
         }
 
         function sleep(msec) {
-            console.log("L234   func sleep");
+            console.log("####   func sleep");
             return new Promise(function(resolve) {
             
                 setTimeout(function() {resolve()}, msec);
@@ -247,7 +254,7 @@
         }
 
         async function speakEffect(targetCanvas){
-            console.log("L243    async func speakeffect");
+            console.log("####    async func speakeffect");
             if (!targetCanvas) {
                 return;
             }
@@ -266,7 +273,7 @@
         }
 
         function stageUpdate(targetStage){
-            console.log("L262   func stageupdate");
+            console.log("####   func stageupdate");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 targetStage.update();
@@ -278,7 +285,7 @@
         }
 
         function successLoadingCheck_A(canvas,targetStage,_tachieLoader){
-            console.log("L274   func success check a");
+            console.log("####   func success check a");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
@@ -289,7 +296,7 @@
                     return;
                 }
                 else if (tick > 13) {
-                    console.log("L281   timeout tachie load");
+                    console.log("####   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     canvas.remove();
                     return;
@@ -327,7 +334,7 @@
                     return;
                 }
                 else if (tick > 13) {
-                    console.log("L319   timeout tachie load");
+                    console.log("####   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     speakerName = canvas.getAttribute("data-speakerName");
                     var speakerNum = speaker[speakerName];
@@ -338,7 +345,7 @@
         }
 
         function minimumNumberDitect (userCanvases){  
-            console.log("L329    minNumDitect");    
+            console.log("####    minNumDitect");    
             var availablePosition = 0;       
             var array = [];
             for (var i = 0; i < 6; i++) {

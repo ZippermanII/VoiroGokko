@@ -1,4 +1,4 @@
-function Subtitles(talkStr,canvas){ 
+function Subtitles(talkStr,txtEdgeColor){ 
 	// var TalkStr = new Object(); 
 	var Canvas = new Object();
     var TalkStr = talkStr;
@@ -42,7 +42,7 @@ function Subtitles(talkStr,canvas){
 	this.textcomment.x = 960;
 	this.textcomment.y = 10;
 	// this.textcomment.y = Number(Canvas['TxtUpSpace']) + HcgFormat['SkinHeight']*(HcgFormat['CommentMax']-1);
-	this.textedgecomment = new createjs.Text(this.textcomment.text, Canvas['TxtSize']+"px "+ "bold " + Canvas['TxtFont'], "#"+Canvas['TxtEdgeColor']);
+	this.textedgecomment = new createjs.Text(this.textcomment.text, Canvas['TxtSize']+"px "+ "bold " + Canvas['TxtFont'], "#"+txtEdgeColor);
 	this.textedgecomment.font = 'bold 120px Umeboshi';
 	this.textedgecomment.x = 960;
 	this.textedgecomment.y = 10;
