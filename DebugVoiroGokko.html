@@ -5,6 +5,13 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
+    <style type="text/css" media="screen, print">
+      @font-face {
+        font-family: "Umeboshi";
+        src: url("http://localhost/ignore/umeboshi_.ttf")
+        format('ttf');
+      }      
+    </style>
     <!--<link rel="stylesheet" href="css/base.css" />-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
@@ -37,7 +44,7 @@
         var emotionsJSON = {};
 
 
-        function init() {
+        function init() {  
             getJSON();
             var subtitlesStage = new createjs.Stage("subtitleCanvas");
             createjs.Ticker.addEventListener('tick', mainLoop);
@@ -56,7 +63,7 @@
             function CommentFunc() {
                 //読み上げ中は処理に侵入させない
                 if(isSpeaking){
-                    console.log("L57 return");
+                    console.log("L57 return　by isSpeaking");
                     return;
                 }
                 //XML読み込み
@@ -76,8 +83,8 @@
                         timeout: 5000,
                         success: function (xml) {
                             xml = xml.getElementsByTagName('chat');
+                            //ここのforループ現状無意味かも？
                             for (var i = checkedXmlLine; i < xml.length; i++) {
-                                isSpeaking = true;
                                 if ((startTime < xml[i].getAttributeNode("date").value) ||
                                     ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                     startTime = xml[i].getAttributeNode("date").value;
@@ -137,6 +144,10 @@
                                                         talk(talkStr,'4000',targetCanvas,subtitlesStage);
                                                     }
                                                 }
+                                                //20200802動作未検証
+                                                else{
+                                                    talk(talkStr,'4000',targetCanvas,subtitlesStage);
+                                                }
                                             }
                                             //キャラ絵を既に呼び出している人
                                             else {
@@ -174,7 +185,6 @@
                                     }
                                     break;
                                 }
-                                console.log("###########");
                                 checkedXmlLine = i;
                                 isSpeaking = false;
                             }
@@ -272,14 +282,17 @@
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
+                console.log("tick");
                 if (_tachieLoader.complete == true) {
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
                     return;
                 }
-                else if (tick > 49) {
+                else if (tick > 13) {
+                    console.log("L281   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     canvas.remove();
+                    return;
                 }
             })
         }
@@ -313,11 +326,13 @@
                     talk(talkStr,speakerNum,canvas,subtitlesStage);
                     return;
                 }
-                else if (tick > 49) {
+                else if (tick > 13) {
+                    console.log("L319   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     speakerName = canvas.getAttribute("data-speakerName");
                     var speakerNum = speaker[speakerName];
                     talk(talkStr,speakerNum,canvas,subtitlesStage);
+                    return;
                 }
             })
         }

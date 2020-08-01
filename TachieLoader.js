@@ -1,7 +1,8 @@
 // JavaScript source code
 
 function tachieLoader(fixedCommand,canvas) {
-    //スキン初期設定
+    //読み込み画像サイズと表示位置の調整、20200801時点ではhtml上で呼び出す
+    //キャンバスがwidth=500pxの時にのみしっくりくるように調整されている
     var scaling = 1;
     var adjustForSdChara = 1;
     this.complete = false;
