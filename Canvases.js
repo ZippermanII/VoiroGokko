@@ -32,16 +32,16 @@ class Canvases {
         var style = newCanvas.style;
         newCanvas.setAttribute("data-position", availablePosition);
         newCanvas.id = userId;
-        newCanvas.width = 400;
+        newCanvas.width = 500;
         newCanvas.height = 1080;
         newCanvas.style.position = "absolute";
         newCanvas.style.zIndex = 10000 - availablePosition;
         //ポジションにあわせて描画位置を調整
         if (availablePosition % 2 == 1) {
-            newCanvas.style.left = "1600px";
+            newCanvas.style.left = "1575px";
         }
         else {
-            newCanvas.style.left = "-90px";
+            newCanvas.style.left = "-150px";
             //共通フォーマットが左向きなので画面右にくる画像は左右反転
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }
@@ -55,7 +55,7 @@ class Canvases {
             newCanvas.style.top = top + "px";
         }
         else {
-            top -= 50;
+            top = 0;
             newCanvas.style.top = top + "px";
         }
         return newCanvas;
