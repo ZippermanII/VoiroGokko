@@ -8,7 +8,7 @@
     <!--<link rel="stylesheet" href="css/base.css" />-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
-    <script src="VoiroGokko.js"></script>
+    <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
     <script>
@@ -123,10 +123,10 @@
                                                         fixedCommand = dataTargetDirectory + "/" + "000";
                                                         document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
                                                         userStage[userId] = new createjs.Stage(targetCanvas);
-                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
                                                         for (let index = 0; index < maxChildIndex - 1; index++) {
                                                             //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
-                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas.width);
+                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas);
                                                             userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
                                                         }                                                            
                                                         userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
@@ -144,7 +144,7 @@
                                                 if (Number(command) < 1000) {
                                                     console.log("L151    number(commmand) < 1000");
                                                     var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                    _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                    _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                     stageUpdate(userStage[userId]);
                                                     userStage[userId].removeChildAt(tachieEmotionLayer +1);
@@ -156,7 +156,7 @@
                                                     speakerName = command.slice(0,command.length - 3);
                                                     var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                     fixedCommand = dataTargetDirectory + "/" + "000";
-                                                    _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
+                                                    _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas);
                                                     targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
                                                     successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage],subtitlesStage);
                                                     targetStage.removeChildAt(tachieBaseLayer + 1);
@@ -299,11 +299,11 @@
                     }
                     for (let index = 0; index < maxChildIndex; index++) {
                         if (index < 2) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),0); 
                         }
                         else if (index > 3) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),3); 
                         }
                     }

@@ -38,10 +38,10 @@ class Canvases {
         newCanvas.style.zIndex = 10000 - availablePosition;
         //ポジションにあわせて描画位置を調整
         if (availablePosition % 2 == 1) {
-            newCanvas.style.left = "1575px";
+            newCanvas.style.left = "1600px";
         }
         else {
-            newCanvas.style.left = "-150px";
+            newCanvas.style.left = "-175px";
             //共通フォーマットが左向きなので画面右にくる画像は左右反転
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }

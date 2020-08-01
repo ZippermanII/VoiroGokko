@@ -1,15 +1,24 @@
 // JavaScript source code
 
-function tachieLoader(fixedCommand,canvasWidth) {
+function tachieLoader(fixedCommand,canvas) {
     //スキン初期設定
     var scaling = 1;
+    var adjustForSdChara = 1;
     this.complete = false;
     this.skinimage = new createjs.Bitmap();//空画像
     this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + fixedCommand + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
         this.complete = true;
         this.skinimage.image = new createjs.Bitmap(event.result).image;
-        scaling = canvasWidth / this.skinimage.image.naturalWidth;
+        adjustForSdChara = this.skinimage.image.naturalWidth / this.skinimage.image.naturalHeight / 2 + 1;
+        if (adjustForSdChara < 1) {
+            adjustForSdChara = 1;
+            this.skinimage.x = 80;
+            this.skinimage.y = -20;
+        }
+        scaling = canvas.width / this.skinimage.image.naturalWidth * adjustForSdChara;
+        this.skinimage.x += -1 * (Math.pow(adjustForSdChara,2.5)) * 60;
+        this.skinimage.y += (Math.pow(adjustForSdChara,2.5)) * 15;
         this.skinimage.scaleX = scaling;
         this.skinimage.scaleY = scaling; 
     }).bind(this), false);//注意
@@ -17,6 +26,9 @@ function tachieLoader(fixedCommand,canvasWidth) {
 };
 tachieLoader.prototype.getSkinImage = function () {
     return this.skinimage;
+};
+tachieLoader.prototype.adjustForSdChara = function () {
+    return this.adjustForSdChara;
 };
 tachieLoader.prototype.complete = function () {
     return this.complete;
