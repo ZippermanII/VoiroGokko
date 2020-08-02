@@ -5,15 +5,25 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
+    <style type="text/css" media="screen, print">
+      @font-face {
+        font-family: "Umeboshi";
+        src: url("http://localhost/ignore/umeboshi_.ttf")
+        format('ttf');
+      }      
+    </style>
     <!--<link rel="stylesheet" href="css/base.css" />-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
-    <script src="VoiroGokko.js"></script>
+    <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
+    <script src="Subtitles.js"></script>
     <script>
         var xmlFileName = "dummycommentlog.xml";
+        var checkedXmlLine = 0;
         var canvases = new Canvases;
         var userId = "123456789";
+        var masterId = "1166687";
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
@@ -30,157 +40,200 @@
             "kiritan":"2002",
             "bouyomi":"4000"
         };
+        var txtEdgeColor ={
+            "2000":"ff80d5",
+            "2001":"80bfff",
+            "2003":"b99ee8",
+            "2002":"800000",
+            "4000":"000000"
+        };
+        var isSpeaking = false;
         var effectsJSON = {};
         var emotionsJSON = {};
 
 
-        function init() {
+        function init() {  
             getJSON();
+            var subtitlesStage = new createjs.Stage("subtitleCanvas");
+            createjs.Ticker.addEventListener('tick', mainLoop);
+            function mainLoop() {
+                subtitlesStage.update();
+            } 
             var thisHtmlName = window.location.href.split('/').pop();
             if (thisHtmlName == "VoiroGokko.html") {
                 xmlFileName = "commentlog.xml";
             }
+
             var startTime = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
+
+
             function CommentFunc() {
-                if (true) {
-                    //XML読み込み
-                    $(function () {
-                        parse();
-                        $("#select_game").change(function () {
-                            var result = $(this).val();
-                            parse(result);
-                        });
+                //読み上げ中は処理に侵入させない
+                if(isSpeaking){
+                    console.log("#### return　by isSpeaking");
+                    return;
+                }
+                //XML読み込み
+                $(function () {
+                    parse();
+                    $("#select_game").change(function () {
+                        var result = $(this).val();
+                        parse(result);
                     });
-                    function parse(type) {
-                        $.ajax({
-                            url: 'http://localhost/ignore/' + xmlFileName,
-                            type: 'GET',
-                            dataType: 'xml',
-                            cache: false,
-                            timeout: 5000,
-                            success: function (xml) {
-                                xml = xml.getElementsByTagName('chat');
-                                for (var i = 0; i < xml.length; i++) {
-                                    if ((startTime < xml[i].getAttributeNode("date").value) ||
-                                        ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
-                                        startTime = xml[i].getAttributeNode("date").value;
-                                        startNo = xml[i].getAttributeNode("no").value;
-                                        var userId = xml[i].getAttributeNode("user_id").value;
-                                        var comment = "";
-                                        comment = xml[i].firstChild.nodeValue;
-                                        //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
-                                        var baseCommandStart = comment.lastIndexOf("##");
-                                        var talkStr = comment.slice(0,baseCommandStart);
-                                        var targetCanvas = document.getElementById(userId);
-                                        var speakerName = "bouyomi";
-                                        if (targetCanvas) {
-                                            speakerName = targetCanvas.getAttribute('data-speakerName');
-                                        }
-                                        var speakerNum = speaker[speakerName];
-                                        if (baseCommandStart != -1) {
-                                            var command = comment.slice(baseCommandStart + 2 , comment.length);
-                                            //コマンドを受けてキャラ絵を操作
-                                            if (command != "") {
-                                                //キャラ絵を退出させるコマンド
+                });
+                function parse(type) {
+                    $.ajax({
+                        url: 'http://localhost/ignore/' + xmlFileName,
+                        type: 'GET',
+                        dataType: 'xml',
+                        cache: false,
+                        timeout: 5000,
+                        success: function (xml) {
+                            xml = xml.getElementsByTagName('chat');
+                            //ここのforループ現状無意味かも？
+                            for (var i = checkedXmlLine; i < xml.length; i++) {
+                                if (isSpeaking) {
+                                    break;
+                                }
+                                if ((startTime < xml[i].getAttributeNode("date").value) ||
+                                    ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
+                                    startTime = xml[i].getAttributeNode("date").value;
+                                    startNo = xml[i].getAttributeNode("no").value;
+                                    var userId = xml[i].getAttributeNode("user_id").value;
+                                    var comment = "";
+                                    comment = xml[i].firstChild.nodeValue;
+                                    //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
+                                    var baseCommandStart = comment.lastIndexOf("##");
+                                    var talkStr = comment.slice(0,baseCommandStart);
+                                    var targetCanvas = document.getElementById(userId);
+                                    var speakerName = "bouyomi";
+                                    if (targetCanvas) {
+                                        speakerName = targetCanvas.getAttribute('data-speakerName');
+                                    }
+                                    var speakerNum = speaker[speakerName];
+                                    if (baseCommandStart != -1) {                                        
+                                        console.log("####  baseCommandStart != -1");
+                                        var command = comment.slice(baseCommandStart + 2 , comment.length);
+                                        //コマンドを受けてキャラ絵を操作
+                                        if (command != "") {
+                                            if (userId == masterId) {
                                                 if (command == "logout") {
-                                                    talk(talkStr,speakerNum,targetCanvas);
+                                                    console.log("####    masterlogout");
+                                                    targetCanvas = document.getElementById(talkStr);
                                                     targetCanvas.remove();
-                                                }
-                                                //キャラ絵をまだ呼び出していない人
-                                                else if (!targetCanvas) {
-                                                    var userCanvases = document.getElementById("UserCanvasWrapper").children;
-                                                    var canvasCount = userCanvases.length;
-                                                    // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
-                                                    var availablePosition = minimumNumberDitect(userCanvases);
-                                                    if (canvasCount < maxUserCanvas) {
-                                                        targetCanvas = canvases.create(userId, availablePosition);
-                                                        //commandからディレクトリ指定文字列を生成
-                                                        speakerName = command.slice(0,command.length - 3);
-                                                        var speakerNum = speaker[speakerName]
-                                                        if (speakerNum) {
-                                                            targetCanvas.setAttribute("data-speakerName", speakerName);
-                                                            var dataTargetDirectory = speakerName + "/" + command.slice(-3);
-                                                            targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
-                                                            fixedCommand = dataTargetDirectory + "/" + "000";
-                                                            document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
-                                                            userStage[userId] = new createjs.Stage(targetCanvas);
-                                                            _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                            for (let index = 0; index < maxChildIndex - 1; index++) {
-                                                                //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
-                                                                var _emptyImgLoader = new tachieLoader("empty", targetCanvas.width);
-                                                                userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
-                                                            }                                                            
-                                                            userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
-                                                            successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
-                                                            talk(talkStr,speakerNum,targetCanvas);
-                                                        }
-                                                        else{
-                                                            console.log(talkStr);
-                                                            talk(talkStr,'4000',targetCanvas);
-                                                        }
-                                                    }
-                                                }
-                                                //キャラ絵を既に呼び出している人
-                                                else {
-                                                    //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
-                                                    if (Number(command) < 1000) {
-                                                        var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
-                                                        stageUpdate(userStage[userId]);
-                                                        userStage[userId].removeChildAt(tachieEmotionLayer +1);
-                                                        talk(talkStr,speakerNum,targetCanvas);
-                                                    }
-                                                    else{
-                                                        var targetStage = userStage[userId];
-                                                        speakerName = command.slice(0,command.length - 3);
-                                                        var dataTargetDirectory = speakerName + "/" + command.slice(-3);
-                                                        fixedCommand = dataTargetDirectory + "/" + "000";
-                                                        _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas.width);
-                                                        targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
-                                                        successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage]);
-                                                        targetStage.removeChildAt(tachieBaseLayer + 1);
-                                                    }
+                                                    break;
                                                 }
                                             }
-                                            else{
-                                                talk(talkStr,speakerNum,targetCanvas);
+                                            //キャラ絵を退出させるコマンド
+                                            if (command == "logout") {
+                                                console.log("####    logout");
+                                                talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
+                                                targetCanvas.remove();
+                                            }
+                                            //キャラ絵をまだ呼び出していない人
+                                            else if (!targetCanvas) {
+                                                var userCanvases = document.getElementById("UserCanvasWrapper").children;
+                                                var canvasCount = userCanvases.length;
+                                                // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
+                                                var availablePosition = minimumNumberDitect(userCanvases);
+                                                if (canvasCount < maxUserCanvas) {
+                                                    targetCanvas = canvases.create(userId, availablePosition);
+                                                    //commandからディレクトリ指定文字列を生成
+                                                    speakerName = command.slice(0,command.length - 3);
+                                                    var speakerNum = speaker[speakerName]
+                                                    if (speakerNum) {
+                                                        targetCanvas.setAttribute("data-speakerName", speakerName);
+                                                        var dataTargetDirectory = speakerName + "/" + command.slice(-3);
+                                                        targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
+                                                        fixedCommand = dataTargetDirectory + "/" + "000";
+                                                        document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
+                                                        userStage[userId] = new createjs.Stage(targetCanvas);
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
+                                                        for (let index = 0; index < maxChildIndex - 1; index++) {
+                                                            //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
+                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas);
+                                                            userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
+                                                        }                                                            
+                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
+                                                        successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
+                                                        talk(talkStr,speakerNum,targetCanvas,subtitlesStage);             
+                                                    }
+                                                    else{
+                                                        talk(talkStr,'4000',targetCanvas,subtitlesStage);
+                                                    }
+                                                }
+                                                //20200802動作未検証
+                                                else{
+                                                    talk(talkStr,'4000',targetCanvas,subtitlesStage);
+                                                }
+                                            }
+                                            //キャラ絵を既に呼び出している人
+                                            else {
+                                                //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
+                                                if (Number(command) < 1000) {
+                                                    console.log("####    number(commmand) < 1000");
+                                                    var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                    _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
+                                                    userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
+                                                    stageUpdate(userStage[userId]);
+                                                    userStage[userId].removeChildAt(tachieEmotionLayer +1);
+                                                    talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
+                                                }
+                                                else{
+                                                    console.log("####  !number(command) < 1000 ");
+                                                    var targetStage = userStage[userId];
+                                                    speakerName = command.slice(0,command.length - 3);
+                                                    var dataTargetDirectory = speakerName + "/" + command.slice(-3);
+                                                    fixedCommand = dataTargetDirectory + "/" + "000";
+                                                    _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas);
+                                                    targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
+                                                    successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage],subtitlesStage);
+                                                    targetStage.removeChildAt(tachieBaseLayer + 1);
+                                                }
                                             }
                                         }
                                         else{
-                                            talk(comment,speakerNum,targetCanvas);
+                                            console.log("####    command type error");
+                                            talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                         }
-                                        break;
                                     }
+                                    else{
+                                        console.log("####    no command");
+                                        talk(comment,speakerNum,targetCanvas,subtitlesStage);
+                                    }
+                                    break;
                                 }
-                            },
-                            error: function () {
-                                //commentxml書き込み中のロードは失敗することがある次の行を有効化するとロード失敗時に一時停止
-                                //alert("dummycommentlog.xmlロード失敗");
+                                checkedXmlLine = i;
                             }
-                        });
-                    }
+                        },
+                        error: function () {
+                            //commentxml書き込み中のロードは失敗することがある次の行を有効化するとロード失敗時に一時停止
+                            //alert("dummycommentlog.xmlロード失敗");
+                        }
+                    });
                 }
+                
             }
             window.addEventListener("load", init);
         }
 
         async function getJSON(){
+            console.log("####     async func getJSON");
             talkerEffectsJSON = await fetch('http://localhost/ignore/talker_effects.json',{"method":"GET"});
             effectsJSON = await talkerEffectsJSON.json();
             talkerEmotionsJSON = await fetch('http://localhost/ignore/talker_emotions.json',{"method":"GET"});
             emotionsJSON = await talkerEmotionsJSON.json();
         }
         
-        async function talk(str,speakerNum,targetCanvas){
-            console.log(effectsJSON);
-            console.log(effectsJSON[String(speakerNum)]);
-            if (str == "") {
-                console.log(str);
+        async function talk(str,speakerNum,targetCanvas,subtitlesStage){         
+            console.log("####    async func talk  ");
+            if (str == "") {            
                 return;
             }
-            console.log("inside talk func");
+            var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
+            subtitlesStage.addChild(SubGen.getEdgeCommentText());
+            subtitlesStage.addChild(SubGen.getCommentText());
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
@@ -194,11 +247,16 @@
                 }),
             };
             speakEffect(targetCanvas);
+            isSpeaking = true;
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
+            isSpeaking = false;
+            subtitlesStage.removeChildAt(0);
+            subtitlesStage.removeChildAt(0);
         }
 
         function sleep(msec) {
+            console.log("####   func sleep");
             return new Promise(function(resolve) {
             
                 setTimeout(function() {resolve()}, msec);
@@ -207,10 +265,12 @@
         }
 
         async function speakEffect(targetCanvas){
+            console.log("####    async func speakeffect");
+            if (!targetCanvas) {
+                return;
+            }
             var t = parseInt(targetCanvas.style.top);
             var transform = targetCanvas.style.transform;
-            var bar = transform.match(/\d+/);
-            console.log(bar);
             for (let index = 0; index < 20; index++) {
                 t -= 6;
                 targetCanvas.style.top = String(t) + "px";
@@ -224,6 +284,7 @@
         }
 
         function stageUpdate(targetStage){
+            console.log("####   func stageupdate");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 targetStage.update();
@@ -235,22 +296,27 @@
         }
 
         function successLoadingCheck_A(canvas,targetStage,_tachieLoader){
+            console.log("####   func success check a");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
+                console.log("tick");
                 if (_tachieLoader.complete == true) {
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
                     return;
                 }
-                else if (tick > 49) {
+                else if (tick > 13) {
+                    console.log("####   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     canvas.remove();
+                    return;
                 }
             })
         }
 
-        function successLoadingCheck_B(talkStr,canvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader){
+        function successLoadingCheck_B(talkStr,canvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader,subtitlesStage){
+            console.log("L291   successcheck b ");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
@@ -264,30 +330,33 @@
                     }
                     for (let index = 0; index < maxChildIndex; index++) {
                         if (index < 2) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),0); 
                         }
                         else if (index > 3) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas.width);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),3); 
                         }
                     }
                     targetStage.update();
                     createjs.Ticker.off("tick", updateTick);
                     var speakerNum = speaker[speakerName];
-                    talk(talkStr,speakerNum,canvas);
+                    talk(talkStr,speakerNum,canvas,subtitlesStage);
                     return;
                 }
-                else if (tick > 49) {
+                else if (tick > 13) {
+                    console.log("####   timeout tachie load");
                     createjs.Ticker.off("tick", updateTick);
                     speakerName = canvas.getAttribute("data-speakerName");
                     var speakerNum = speaker[speakerName];
-                    talk(talkStr,speakerNum,canvas);
+                    talk(talkStr,speakerNum,canvas,subtitlesStage);
+                    return;
                 }
             })
         }
 
-        function minimumNumberDitect (userCanvases){      
+        function minimumNumberDitect (userCanvases){  
+            console.log("####    minNumDitect");    
             var availablePosition = 0;       
             var array = [];
             for (var i = 0; i < 6; i++) {
@@ -319,12 +388,33 @@
             return availablePosition;
         }
 
+        //後日実装ユーザーステータス保存機能
+        function canvasSave(canvas){
+            // $.ajax({
+            //     url: 'http://localhost/ignore/user_status_save.xml',
+            //     type: 'GET',
+            //     dataType: 'xml',
+            //     cache: false,
+            //     timeout: 5000,
+            //     success: function (xml) {
+            //         var savedata = xml.getElementsByTagName(canvas.getAttribute("id")); 
+            //         if (!savedata) {
+            //             savedata = new document.createElement(canvas.getAttribute("id")); 
+            //         }                
+            //         savedata.setAttribute("data-speakername",canvas.getAttribute("data-speakername"));
+            //         savedata.setAttribute("data-targetdirectory",canvas.getAttribute("data-targetdirectory"));
+            //     }
+            // });
+            // elementObj.setAttribute("",canvas.getAttribute(""));
+        }
+
     </script>
 </head>
 <body onload="init();">
     <div id="UserCanvasWrapper">
     </div>
     <div id="another">
+        <canvas id="subtitleCanvas" width="1920" height="1080" style="position: absolute; z-index: 200; left: 0px; transform: scale(1, 1); top: 900px;"></canvas>
         <canvas id="otherCanvas5" width="50" height="0"></canvas>
     </div>
 </body>

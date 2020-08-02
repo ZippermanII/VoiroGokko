@@ -23,6 +23,7 @@
         var checkedXmlLine = 0;
         var canvases = new Canvases;
         var userId = "123456789";
+        var masterId = "1166687";
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
@@ -92,6 +93,9 @@
                             xml = xml.getElementsByTagName('chat');
                             //ここのforループ現状無意味かも？
                             for (var i = checkedXmlLine; i < xml.length; i++) {
+                                if (isSpeaking) {
+                                    break;
+                                }
                                 if ((startTime < xml[i].getAttributeNode("date").value) ||
                                     ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
                                     startTime = xml[i].getAttributeNode("date").value;
@@ -113,6 +117,14 @@
                                         var command = comment.slice(baseCommandStart + 2 , comment.length);
                                         //コマンドを受けてキャラ絵を操作
                                         if (command != "") {
+                                            if (userId == masterId) {
+                                                if (command == "logout") {
+                                                    console.log("####    masterlogout");
+                                                    targetCanvas = document.getElementById(talkStr);
+                                                    targetCanvas.remove();
+                                                    break;
+                                                }
+                                            }
                                             //キャラ絵を退出させるコマンド
                                             if (command == "logout") {
                                                 console.log("####    logout");
@@ -193,7 +205,6 @@
                                     break;
                                 }
                                 checkedXmlLine = i;
-                                isSpeaking = false;
                             }
                         },
                         error: function () {
@@ -217,8 +228,7 @@
         
         async function talk(str,speakerNum,targetCanvas,subtitlesStage){         
             console.log("####    async func talk  ");
-            if (str == "") {                
-                isSpeaking = false;
+            if (str == "") {            
                 return;
             }
             var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
@@ -237,6 +247,7 @@
                 }),
             };
             speakEffect(targetCanvas);
+            isSpeaking = true;
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
             isSpeaking = false;
@@ -403,7 +414,7 @@
     <div id="UserCanvasWrapper">
     </div>
     <div id="another">
-        <canvas id="subtitleCanvas" width="1920" height="1080" style="position: absolute; z-index: 0; left: 0px; transform: scale(1, 1); top: 900px;"></canvas>
+        <canvas id="subtitleCanvas" width="1920" height="1080" style="position: absolute; z-index: 200; left: 0px; transform: scale(1, 1); top: 900px;"></canvas>
         <canvas id="otherCanvas5" width="50" height="0"></canvas>
     </div>
 </body>

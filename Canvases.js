@@ -35,7 +35,7 @@ class Canvases {
         newCanvas.width = 500;
         newCanvas.height = 1080;
         newCanvas.style.position = "absolute";
-        newCanvas.style.zIndex = 10000 - availablePosition;
+        newCanvas.style.zIndex = 100 - availablePosition;
         //ポジションにあわせて描画位置を調整
         if (availablePosition % 2 == 1) {
             newCanvas.style.left = "1600px";
