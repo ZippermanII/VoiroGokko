@@ -6,6 +6,7 @@ import struct
 import re
 import os
 import json
+import time
 from datetime import datetime
 from xml.dom import minidom
 import sys
@@ -43,6 +44,18 @@ class DummyNicoliveCommentReceiver:
         output_str = base1 + str(now_ts) + base2 + str(no) + base3 + dummy_id + base4 + dummy_command + base5
         return  output_str
 
+    def machine_gun_loop(self,no):
+        base1 = '<chat date="'
+        base2 = '" no="'
+        base3 = '" user_id="'
+        base4 = '">'
+        base5 = '</chat>'
+        now = datetime.now()
+        now_ts = int(now.timestamp()) 
+        nowStr = str(now)
+        dummy_id = str(int(nowStr[-1]) * 111111111111111111)
+        output_str = base1 + str(now_ts) + base2 + str(no) + base3 + dummy_id + base4 + 'dummy_comment' + base5
+        return  output_str
 #
 # # commentlog.xmlをバックアップし新たなxmlを生成
 # try:
@@ -69,7 +82,30 @@ no = 1
 # ダミーコメントを取得して表示
 while True:
     inp = input("ダミーコマンドを入力してください。")
-    dummystr = dncr.make_dummy_element(inp,no)
-    print(dummystr)
-    dncr.make_xml(dummystr)
-    no += 1
+    # 短時間でコメントを連投するモード
+    if inp == 'machinegunmode':  
+        while True:
+            i = 0
+            if i < 5:
+                time.sleep(0.01)
+                dummystr = dncr.machine_gun_loop(no)
+                print(dummystr)
+                try:
+                    dncr.make_xml(dummystr)
+                except:
+                    import traceback
+                    traceback.print_exc()
+                    traceback.print_exc()
+                    traceback.print_exc()
+                    traceback.print_exc()
+                    traceback.print_exc()
+                no += 1
+                i += 1
+            else:
+                time.sleep(5)
+                i = 0
+    else:
+        dummystr = dncr.make_dummy_element(inp,no)
+        print(dummystr)
+        dncr.make_xml(dummystr)
+        no += 1

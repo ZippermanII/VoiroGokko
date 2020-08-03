@@ -1,7 +1,6 @@
 function Subtitles(talkStr,txtEdgeColor){ 
 	// var TalkStr = new Object(); 
 	var Canvas = new Object();
-    var TalkStr = talkStr;
     Canvas = {};
     Canvas['TxtSize'] = "120";
     Canvas['TxtColor'] = "ffffff";

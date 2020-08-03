@@ -120,6 +120,10 @@ sock.send(struct.pack('b', 0))
 data = sock.recv(2048)
 # コメントを取得して表示
 while True:
-    data = sock.recv(2048)[:-1]
-    come = re.sub(r'', '', data.decode())
-    ncr.make_xml(come)
+    try:
+        data = sock.recv(2048)[:-1]
+        come = re.sub(r'', '', data.decode())
+        ncr.make_xml(come)
+    except:
+        import traceback
+        traceback.print_exc()
