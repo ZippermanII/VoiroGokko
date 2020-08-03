@@ -16,12 +16,11 @@ import pprint
 # 放送のIDをいれる
 
 
-lvno = "lv326736005"
 
 class NicoliveCommentReceiver:
 
 
-    def get_lv(self):
+    def get_lv(self,coNo):
         self.community_URL = 'http://com.nicovideo.jp/community/co3097203'
         html = urllib.request.urlopen(self.community_URL).read().decode('utf-8')
         m = re.search('watch/(lv[0-9]+)', html)
@@ -44,7 +43,13 @@ class NicoliveCommentReceiver:
 
 
 ncr = NicoliveCommentReceiver()
-lvno = ncr.get_lv()
+lvno = ncr.get_lv('co3097203')
+# lvno = ncr.get_lv('co5008727')
+# if lvno is None:
+#     lvno = ncr.get_lv('co3097203')
+#     print('co5008727 is not streaming')
+
+# print(lvno)
 
 # commentlog.xmlをバックアップし新たなxmlを生成
 try:
@@ -120,6 +125,7 @@ sock.send(struct.pack('b', 0))
 data = sock.recv(2048)
 # コメントを取得して表示
 while True:
+    print("l127")
     try:
         data = sock.recv(2048)[:-1]
         come = re.sub(r'', '', data.decode())
