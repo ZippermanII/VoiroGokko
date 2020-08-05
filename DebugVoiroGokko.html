@@ -226,7 +226,8 @@
             emotionsJSON = await talkerEmotionsJSON.json();
         }
         
-        async function talk(str,speakerNum,targetCanvas,subtitlesStage){         
+        async function talk(str,speakerNum,targetCanvas,subtitlesStage){             
+            console.log(speakerNum);       
             console.log("####    async func talk  ");
             if (str == "") {            
                 return;
@@ -234,9 +235,12 @@
             var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
             subtitlesStage.addChild(SubGen.getEdgeCommentText());
             subtitlesStage.addChild(SubGen.getCommentText());
-            //生声配信時用ボリュームダウン設定
-            if (targetCanvas.getAttribute("id") == "1166687" ) {
-                effectsJSON[speakerNum].volume = 0.2;     
+            //生声配信時用ボリュームダウン設定 
+            if ((targetCanvas)&&(targetCanvas.getAttribute("id") == "1166687" )) {
+                effectsJSON[speakerNum].volume = 0.1;     
+            }
+            else if(speakerNum == "4000"){
+                effectsJSON[speakerNum].volume = 31;
             }
             else{
                 effectsJSON[speakerNum].volume = 1;
@@ -254,13 +258,15 @@
                     "emotions":emotionsJSON[speakerNum]
                 }),
             };
+            console.log(fetchopt);
             speakEffect(targetCanvas);
             isSpeaking = true;
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
             isSpeaking = false;
-            subtitlesStage.removeChildAt(0);
-            subtitlesStage.removeChildAt(0);
+            console.log(subtitlesStage.children.length);
+            subtitlesStage.removeAllChildren();
+            console.log(subtitlesStage.children.length);
         }
 
         function sleep(msec) {
