@@ -1,5 +1,4 @@
 function Subtitles(talkStr,sentenceEdgeColor){ 
-	console.log("");
 	// var TalkStr = new Object(); 
 	var Canvas = new Object();
     Canvas = {};
@@ -23,8 +22,6 @@ function Subtitles(talkStr,sentenceEdgeColor){
 	this.upSpace = Canvas['sentenceUpSpace'];
 	this.leftSpace = Canvas['sentenceLeftSpace'];
 	//テキスト
-	console.log(Canvas['sentenceFont']);
-	console.log(Canvas['sentenceSize']);
 	this.textcomment = new createjs.Text("", String(Canvas['sentenceSize']) +"px "+ "bold " + Canvas['sentenceFont'], "#"+ Canvas['sentenceColor']);
 	//ここで改めてフォントを指定しないとなぜか変わってくれない
 	var fontsize = 160;
@@ -38,15 +35,12 @@ function Subtitles(talkStr,sentenceEdgeColor){
 		this.textcomment.text = this.textcomment.text + talkStr.substring(i,i+1);
 		sentenceWidth = Number(Number(this.textcomment.getMeasuredWidth())+Number(Canvas['sentenceLeftSpace']));
 		if(sentenceWidth <= sentenceMaxLength){
-			console.log(sentenceWidth);
 			continue;
 		}
 		else if((sentenceWidth > sentenceMaxLength)&&(fontsize > minFontSize)) {
-			console.log("wid > max");
 			//console.log(Number(Number(this.textcomment.getMeasuredWidth())+Number(Canvas['sentenceLeftSpace'])));
 			fontsize -= 10;
 			this.textcomment.font = 'bold ' + String(fontsize)+ "px " + 'Umeboshi';
-			console.log(this.textcomment.font);
 			this.textcomment.text = "";
 			i = -1;
 			continue;
@@ -58,19 +52,15 @@ function Subtitles(talkStr,sentenceEdgeColor){
 			// break;
 		}
 		else{
-			console.log("else");
 			this.textcomment.text = this.textcomment.text + '\r';
 			i += 1;
 			sentenceMaxLength *= 2.1;
 			for (let index = i; index < talkStr.length; index++) {
 				sentenceWidth = Number(Number(this.textcomment.getMeasuredWidth())+Number(Canvas['sentenceLeftSpace']));
 				if (sentenceWidth <= sentenceMaxLength) {
-					console.log("sentenceWdth = " + sentenceWidth);
-					console.log("sentenceMaxLength = " + sentenceMaxLength);
 					this.textcomment.text = this.textcomment.text + talkStr.substring(index,index+1);			
 				}
 				else{
-					console.log("sentenceWdth = " + sentenceWidth);
 					this.textcomment.text = 
 						this.textcomment.text.substr(0, index - Canvas['sentenceLengthValue'].length +1)
 						+ Canvas['sentenceLengthValue'].trim();

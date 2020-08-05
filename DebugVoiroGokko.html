@@ -234,6 +234,14 @@
             var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
             subtitlesStage.addChild(SubGen.getEdgeCommentText());
             subtitlesStage.addChild(SubGen.getCommentText());
+            //生声配信時用ボリュームダウン設定
+            if (targetCanvas.getAttribute("id") == "1166687" ) {
+                effectsJSON[speakerNum].volume = 0.2;     
+            }
+            else{
+                effectsJSON[speakerNum].volume = 1;
+            }
+            //
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
