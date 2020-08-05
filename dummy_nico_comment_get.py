@@ -35,6 +35,8 @@ class DummyNicoliveCommentReceiver:
         base5 = '</chat>'
         # base6 = '" user_id="'
         # base7 = '" user_id="'
+        if input_str[0].isdecimal() is False:
+            input_str = "1" + input_str
         dummy_command = input_str[1:]
         print(dummy_command)
         dummy_id = str(int(input_str[0]) * 111111111111111111)
