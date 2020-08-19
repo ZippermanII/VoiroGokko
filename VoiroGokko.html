@@ -19,7 +19,7 @@
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
     <script>
-        var xmlFileName = "dummycommentlog.xml";
+        var xmlFileName = "commentlog.xml";
         var checkedXmlLine = 0;
         var canvases = new Canvases;
         var userId = "123456789";
@@ -237,7 +237,7 @@
             subtitlesStage.addChild(SubGen.getCommentText());
             //生声配信時用ボリュームダウン設定 
             if ((targetCanvas)&&(targetCanvas.getAttribute("id") == "1166687" )) {
-                effectsJSON[speakerNum].volume = 0.1;     
+                effectsJSON[speakerNum].volume = 1;     
             }
             else if(speakerNum == "4000"){
                 effectsJSON[speakerNum].volume = 31;

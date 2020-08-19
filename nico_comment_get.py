@@ -6,6 +6,7 @@ import struct
 import re
 import os
 import json
+import time
 from datetime import datetime
 from xml.dom import minidom
 import sys
@@ -21,14 +22,20 @@ class NicoliveCommentReceiver:
 
 
     def get_lv(self,coNo):
-        self.community_URL = 'http://com.nicovideo.jp/community/co3097203'
+        self.community_URL = 'http://com.nicovideo.jp/community/' + coNo
         html = urllib.request.urlopen(self.community_URL).read().decode('utf-8')
-        m = re.search('watch/(lv[0-9]+)', html)
-        if m is None:
-            os.system('PAUSE')
-            return None
+        nowLive = re.search('now_live_inner', html)
+        if nowLive is not None:
+            m = re.search('watch/(lv[0-9]+)', html)
+            if m is None:
+                print(" m is none")
+                os.system('PAUSE')
+                return None
+            else:
+                return m.group(1)
         else:
-            return m.group(1)
+            print("aaaaaaaaa is none")
+            return None
 
     def make_xml(self,come):
         # xmlデータを読み込みます
@@ -43,7 +50,29 @@ class NicoliveCommentReceiver:
 
 
 ncr = NicoliveCommentReceiver()
-lvno = ncr.get_lv('co3097203')
+
+while True:
+    comunity = "ぼいろごっこ"
+    lvno = ncr.get_lv('co5008727')
+    if lvno is None:
+        print("lvno is none")
+        time.sleep(5)
+        comunity = "こばわんわ！！！"
+        lvno = ncr.get_lv('co3097203')
+        if lvno is None:
+            print("lvno is none")
+            time.sleep(5)
+            comunity = "テスト配信用コミュ"
+            lvno = ncr.get_lv('co3584440')
+            if lvno is None:
+                print("lvno is none")
+                time.sleep(5)
+                continue
+    
+    break
+        
+print(comunity)
+    
 # lvno = ncr.get_lv('co5008727')
 # if lvno is None:
 #     lvno = ncr.get_lv('co3097203')
