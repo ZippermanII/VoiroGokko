@@ -230,7 +230,7 @@
         
         async function talk(str,speakerNum,targetCanvas,subtitlesStage){  
             console.log("####    async func talk  ");
-            if (str == "") {            
+            if ((str == "")||(str[0]=="/")) {            
                 return;
             }
             var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
