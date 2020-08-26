@@ -15,11 +15,13 @@
     <!--<link rel="stylesheet" href="css/base.css" />-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+    <script src="HostSelect.js"></script>
     <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
     <script>
         var xmlFileName = "dummycommentlog.xml";
+        var hostURL = "";
         var checkedXmlLine = 0;
         var canvases = new Canvases;
         var userId = "123456789";
@@ -52,7 +54,8 @@
         var emotionsJSON = {};
 
 
-        function init() {  
+        function init() {          
+            hostURL = HostSelect();
             getJSON();
             var subtitlesStage = new createjs.Stage("subtitleCanvas");
             createjs.Ticker.addEventListener('tick', mainLoop);
@@ -84,7 +87,7 @@
                 });
                 function parse(type) {
                     $.ajax({
-                        url: 'http://localhost/ignore/' + xmlFileName,
+                        url: hostURL + 'ignore/' + xmlFileName,
                         type: 'GET',
                         dataType: 'xml',
                         cache: false,
@@ -149,10 +152,10 @@
                                                         fixedCommand = dataTargetDirectory + "/" + "000";
                                                         document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
                                                         userStage[userId] = new createjs.Stage(targetCanvas);
-                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                         for (let index = 0; index < maxChildIndex - 1; index++) {
                                                             //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
-                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas);
+                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas,hostURL);
                                                             userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
                                                         }                                                            
                                                         userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
@@ -174,7 +177,7 @@
                                                 if (Number(command) < 1000) {
                                                     console.log("####    number(commmand) < 1000");
                                                     var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
-                                                    _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas);
+                                                    _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                     stageUpdate(userStage[userId]);
                                                     userStage[userId].removeChildAt(tachieEmotionLayer +1);
@@ -186,7 +189,7 @@
                                                     speakerName = command.slice(0,command.length - 3);
                                                     var dataTargetDirectory = speakerName + "/" + command.slice(-3);
                                                     fixedCommand = dataTargetDirectory + "/" + "000";
-                                                    _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas);
+                                                    _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
                                                     successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage],subtitlesStage);
                                                     targetStage.removeChildAt(tachieBaseLayer + 1);
@@ -219,15 +222,13 @@
         }
 
         async function getJSON(){
-            console.log("####     async func getJSON");
-            talkerEffectsJSON = await fetch('http://localhost/ignore/talker_effects.json',{"method":"GET"});
+            talkerEffectsJSON = await fetch(hostURL + 'ignore/talker_effects.json',{"method":"GET"});
             effectsJSON = await talkerEffectsJSON.json();
-            talkerEmotionsJSON = await fetch('http://localhost/ignore/talker_emotions.json',{"method":"GET"});
+            talkerEmotionsJSON = await fetch(hostURL + 'ignore/talker_emotions.json',{"method":"GET"});
             emotionsJSON = await talkerEmotionsJSON.json();
         }
         
-        async function talk(str,speakerNum,targetCanvas,subtitlesStage){             
-            console.log(speakerNum);       
+        async function talk(str,speakerNum,targetCanvas,subtitlesStage){  
             console.log("####    async func talk  ");
             if (str == "") {            
                 return;
@@ -237,7 +238,7 @@
             subtitlesStage.addChild(SubGen.getCommentText());
             //生声配信時用ボリュームダウン設定 
             if ((targetCanvas)&&(targetCanvas.getAttribute("id") == "1166687" )) {
-                effectsJSON[speakerNum].volume = 0.1;     
+                effectsJSON[speakerNum].volume = 1;     
             }
             else if(speakerNum == "4000"){
                 effectsJSON[speakerNum].volume = 31;
@@ -250,7 +251,10 @@
             const fetchopt = {
                 "mode":"no-cors",
                 "credentials":"include",
-                "headers":{},
+                "headers":{
+                            'Authorization' : 'Basic ' + btoa(unescape(encodeURIComponent( "SeikaServerUser" + ":" + "SeikaServerPassword" ))),
+                            'Content-Type'  : 'application/json'
+                          },
                 "method":"POST",
                 "body":JSON.stringify({
                     "talktext":str,
@@ -258,15 +262,12 @@
                     "emotions":emotionsJSON[speakerNum]
                 }),
             };
-            console.log(fetchopt);
             speakEffect(targetCanvas);
             isSpeaking = true;
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             // const json = await res.json();
             isSpeaking = false;
-            console.log(subtitlesStage.children.length);
             subtitlesStage.removeAllChildren();
-            console.log(subtitlesStage.children.length);
         }
 
         function sleep(msec) {
@@ -330,7 +331,7 @@
         }
 
         function successLoadingCheck_B(talkStr,canvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader,subtitlesStage){
-            console.log("L291   successcheck b ");
+            console.log("####   successcheck b ");
             var tick = 0;
             var updateTick = createjs.Ticker.on("tick", function () {
                 tick += 1;
@@ -344,11 +345,11 @@
                     }
                     for (let index = 0; index < maxChildIndex; index++) {
                         if (index < 2) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas,hostURL);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),0); 
                         }
                         else if (index > 3) {
-                            var _emptyImgLoader = new tachieLoader("empty", canvas);
+                            var _emptyImgLoader = new tachieLoader("empty", canvas,hostURL);
                             targetStage.addChildAt(_emptyImgLoader.getSkinImage(canvas.width),3); 
                         }
                     }

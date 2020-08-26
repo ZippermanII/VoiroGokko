@@ -1,13 +1,13 @@
 // JavaScript source code
 
-function tachieLoader(fixedCommand,canvas) {
+function tachieLoader(fixedCommand,canvas,hostURL) {
     //読み込み画像サイズと表示位置の調整、20200801時点ではhtml上で呼び出す
     //キャンバスがwidth=500pxの時にのみしっくりくるように調整されている
     var scaling = 1;
     var adjustForSdChara = 1;
     this.complete = false;
     this.skinimage = new createjs.Bitmap();//空画像
-    this.skinloader = new createjs.ImageLoader('http://localhost/skins/' + fixedCommand + '.png', false);
+    this.skinloader = new createjs.ImageLoader(hostURL + 'skins/' + fixedCommand + '.png', false);
     this.skinloader.addEventListener("complete", (function (event) {
         this.complete = true;
         this.skinimage.image = new createjs.Bitmap(event.result).image;
@@ -24,7 +24,7 @@ function tachieLoader(fixedCommand,canvas) {
         this.skinimage.scaleY = scaling; 
     }).bind(this), false);//注意
     this.skinloader.load();//注意
-};
+}
 tachieLoader.prototype.getSkinImage = function () {
     return this.skinimage;
 };
