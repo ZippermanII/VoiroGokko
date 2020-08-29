@@ -12,13 +12,15 @@ pythonスクリプトでライブ配信に接続してチャットデータを�
 このxmlファイルをajaxでOBSブラウザ上のjsに渡して画像操作コマンドを解析、表示。
 
 
-## 仕様詳細(仮) (※印は実装検討前段階)
-・想定環境
+## 取扱説明(仮) (※印は実装検討前段階)
+・想定環境(＃印はインストール必須)
   javascript
-  python3.6
+  ＃python3系(3.6にて動作確認)
 　ニコニコ生放送 (※)YoutubeLive Twitch
-　OBS (Open Broadcaster Software)
-  AssistantSeika(https://hgotoh.jp/wiki/doku.php/documents/voiceroid/assistantseika)
+　＃OBS (Open Broadcaster Software)
+  ＃AssistantSeika(https://hgotoh.jp/wiki/doku.php/documents/voiceroid/assistantseika)
+　＃各種AssistanSeika対応の読上げアプリ(ex.棒読みちゃん、VOICEROID)
+　＃xampp(バンドルされているapacheを使用)
 
 ・コマンド
 　文末の##の後の文字列をコマンドとする。(##akane000)
@@ -45,3 +47,38 @@ pythonスクリプトでライブ配信に接続してチャットデータを�
 
 ### Tips
 OBS Studio ブラウザソース ショートカットを作成して --remote-debugging-port=9222 フラグをつけて起動後 http://localhost:9222 にアクセスするとコンソールでどのようなエラーが発生しているのかを確認できる。
+
+
+
+
+＃＃＃＃＃＃＃＃＃＃ここから草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
+
+立ち絵を準備する→フォーマット通りにリサイズしてもらう→
+フォーマット通りのディレクトリにフォーマット通りのファイル名で配置してもらう
+
+xampp起動→Apacheのconfig→Apache(httpd.conf)でメモ帳が開く→
+ルートディレクトリをvoirogokko.htmlのある場所に変更→
+FileEtag None
+RequestHeader unset If-Modified-Since
+Header set Cache-Control no-store
+# Header set Access-Control-Allow-Headers "Content-Type"
+# Header set Access-Control-Allow-Origin "http://localhost/"
+# Header set Access-Control-Allow-Origin "http://localhost:7180/"
+を最後に書き加える→Start
+
+各種読上げアプリを設定して起動
+
+AssistantSeika起動→製品スキャン→http機能→ワークフォルダを設定→チェックボックスオン→起動
+
+obs起動→ソースにブラウザを追加→ソースの描画順を適宜変更→プロパティを開く→
+URLにApacheサーバ経由でのVoiroGokko.htmlへのURLを入力
+
+ignoreフォルダ内にconfig.jsonを用意する→
+user_session_sidの値をニコニコにログインしているブラウザのクッキーから持ってくる→
+コミュニティ番号を入力しておく
+
+ニコ生を開始する→nico_comment_get.pyを起動→OBSで読み込んだVoiroGokko.htmlをリロード
+
+ニコ生でコメントが発生すると読上げと字幕が発生する
+
+＃＃＃＃＃＃＃＃＃＃ここまで草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
