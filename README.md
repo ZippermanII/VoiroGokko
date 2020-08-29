@@ -16,8 +16,9 @@ pythonスクリプトでライブ配信に接続してチャットデータを�
 ・想定環境
   javascript
   python3.6
-　OBS (Open Broadcaster Software)
 　ニコニコ生放送 (※)YoutubeLive Twitch
+　OBS (Open Broadcaster Software)
+  AssistantSeika(https://hgotoh.jp/wiki/doku.php/documents/voiceroid/assistantseika)
 
 ・コマンド
 　文末の##の後の文字列をコマンドとする。(##akane000)

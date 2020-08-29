@@ -93,7 +93,12 @@
                         cache: false,
                         timeout: 5000,
                         success: function (xml) {
-                            xml = xml.getElementsByTagName('chat');
+                            try {
+                                xml = xml.getElementsByTagName('chat');
+                            } catch( e ) {
+                                console.log("#### return　by getElementsByTagName'chat' Error");
+                                return;
+                            }
                             //ここのforループ現状無意味かも？
                             for (var i = checkedXmlLine; i < xml.length; i++) {
                                 if (isSpeaking) {
@@ -105,7 +110,12 @@
                                     startNo = xml[i].getAttributeNode("no").value;
                                     var userId = xml[i].getAttributeNode("user_id").value;
                                     var comment = "";
-                                    comment = xml[i].firstChild.nodeValue;
+                                    try{
+                                        comment = xml[i].firstChild.nodeValue;
+                                    }catch(e){
+                                console.log("#### return　by xml have no child Error");
+                                        return;
+                                    }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                     var baseCommandStart = comment.lastIndexOf("##");
                                     var talkStr = comment.slice(0,baseCommandStart);
@@ -264,7 +274,9 @@
             };
             speakEffect(targetCanvas);
             isSpeaking = true;
+            console.log("before fetch");
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
+            console.log("after fetch");
             // const json = await res.json();
             isSpeaking = false;
             subtitlesStage.removeAllChildren();

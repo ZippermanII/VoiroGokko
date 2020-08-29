@@ -34,7 +34,7 @@ class NicoliveCommentReceiver:
             else:
                 return m.group(1)
         else:
-            print("aaaaaaaaa is none")
+            print("nowLive is none")
             return None
 
     def make_xml(self,come):
@@ -51,36 +51,6 @@ class NicoliveCommentReceiver:
 
 ncr = NicoliveCommentReceiver()
 
-while True:
-    comunity = "ぼいろごっこ"
-    lvno = ncr.get_lv('co5008727')
-    if lvno is None:
-        print("lvno is none")
-        time.sleep(5)
-        comunity = "こばわんわ！！！"
-        lvno = ncr.get_lv('co3097203')
-        if lvno is None:
-            print("lvno is none")
-            time.sleep(5)
-            comunity = "テスト配信用コミュ"
-            lvno = ncr.get_lv('co3584440')
-            if lvno is None:
-                print("lvno is none")
-                time.sleep(5)
-                continue
-    
-    break
-        
-print(comunity)
-    
-# lvno = ncr.get_lv('co5008727')
-# if lvno is None:
-#     lvno = ncr.get_lv('co3097203')
-#     print('co5008727 is not streaming')
-
-# print(lvno)
-
-# commentlog.xmlをバックアップし新たなxmlを生成
 try:
     with open ("ignore/commentlog.xml",mode='x') as f:
         s = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><log></log>'
@@ -92,13 +62,39 @@ root = tree.getroot()
 chat = root.find('chat')
 if chat is not None:
     date = chat.get('date')
-    time = datetime.fromtimestamp(int(date))
-    timestr = time.strftime("%Y%m%d%H%M%S")
+    starttime = datetime.fromtimestamp(int(date))
+    timestr = starttime.strftime("%Y%m%d%H%M%S")
     tree.write(os.path.join('ignore', timestr + 'commentlog.xml'))
 
     for chats in root.findall('chat'):
         root.remove(chats)
         tree.write(os.path.join('ignore', 'commentlog.xml'))
+else:
+    print('FileExistsError commentlog.xml')
+    os.system("PAUSE")
+
+loopnum = 0
+
+while True:
+    if loopnum % 3 == 0:        
+        comunity = "ぼいろごっこ"
+        lvno = ncr.get_lv('co5008727')
+    elif loopnum % 3 == 1:
+        comunity = "こばわんわ！！！"
+        lvno = ncr.get_lv('co3097203')
+    else:
+        comunity = "テスト配信用コミュ"
+        lvno = ncr.get_lv('co3584440')
+    loopnum += 1
+    if lvno is not None:
+        break
+    if loopnum == 6:
+        lvno = input("配信中のURLのlvから始まる番号をlvも含めて入力")
+        break
+    print(comunity + " is not streaming.")
+    time.sleep(5)
+        
+print(comunity)
 
 
 # ニコ生にログインしてるブラウザからクッキー"user_session"の値を持ってきてsidに入れる
@@ -133,11 +129,15 @@ r.close()
 # XMLのデータからサーバのアドレス,ポート番号と、スレッドidを取り出す
 doc = minidom.parseString(data)
 child = doc.getElementsByTagName('getplayerstatus')[0]
-if child.getElementsByTagName('ms'):
+status = child.getAttribute('status')
+if status == 'ok':
     mstag = child.getElementsByTagName('ms')[0]
     addr = mstag.getElementsByTagName('addr')[0].firstChild.data.strip()
     port = mstag.getElementsByTagName('port')[0].firstChild.data.strip()
     threadid = mstag.getElementsByTagName('thread')[0].firstChild.data.strip()
+else:
+    print('getplayerstatus error')
+    os.system('PAUSE')
 
 # ソケット生成し、取得したアドレス、ポートで接続
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
