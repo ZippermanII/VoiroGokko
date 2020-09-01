@@ -51,7 +51,7 @@ OBS Studio ブラウザソース ショートカットを作成して --remote-d
 
 
 
-＃＃＃＃＃＃＃＃＃＃ここから草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
+# ＃＃＃＃＃＃＃＃＃＃ここから草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
 
 立ち絵を準備する→フォーマット通りにリサイズしてもらう→
 フォーマット通りのディレクトリにフォーマット通りのファイル名で配置してもらう
@@ -61,9 +61,9 @@ xampp起動→Apacheのconfig→Apache(httpd.conf)でメモ帳が開く→
 FileEtag None
 RequestHeader unset If-Modified-Since
 Header set Cache-Control no-store
-# Header set Access-Control-Allow-Headers "Content-Type"
-# Header set Access-Control-Allow-Origin "http://localhost/"
-# Header set Access-Control-Allow-Origin "http://localhost:7180/"
+Header set Access-Control-Allow-Headers "Content-Type"
+Header set Access-Control-Allow-Origin "http://localhost/"
+Header set Access-Control-Allow-Origin "http://localhost:7180/"
 を最後に書き加える→Start
 
 各種読上げアプリを設定して起動
@@ -81,4 +81,4 @@ user_session_sidの値をニコニコにログインしているブラウザの�
 
 ニコ生でコメントが発生すると読上げと字幕が発生する
 
-＃＃＃＃＃＃＃＃＃＃ここまで草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
+# ＃＃＃＃＃＃＃＃＃＃ここまで草案につき現状意味不明状態＃＃＃＃＃＃＃＃＃＃
