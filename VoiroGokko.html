@@ -71,7 +71,7 @@
 
 
         function init() {          
-            hostURL = HostSelect();
+            hostURL = HostSelect(location.href);
             getJSON();
             var subtitlesStage = new createjs.Stage("subtitleCanvas");
             createjs.Ticker.addEventListener('tick', mainLoop);

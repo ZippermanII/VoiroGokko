@@ -1,6 +1,6 @@
-function HostSelect(){
+function HostSelect(selfURL){
     var hostURL = "";
-    var testServer = confirm("テストサーバーに接続しますか？");
+    var testServer = confirm(selfURL + "テストサーバーに接続しますか？");
     if(testServer){
         hostURL = "http://localhost/";
         console.log("connect to http://localhost/");
