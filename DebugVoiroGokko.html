@@ -16,6 +16,7 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
     <script src="HostSelect.js"></script>
+    <script src="CommentParse.js"></script>
     <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
@@ -133,17 +134,28 @@
                                         return;
                                     }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
-                                    var baseCommandStart = comment.lastIndexOf("##");
-                                    var talkStr = comment.slice(0,baseCommandStart);
                                     var targetCanvas = document.getElementById(userId);
-                                    var speakerName = "bouyomi";
-                                    if (targetCanvas) {
+                                    var _commentParse = new commentParse(comment,speaker);
+                                    var talkStr = _commentParse.getTalkStr();
+                                    var command = _commentParse.getCommand();
+                                    var speakerName = "";
+                                    var artist = _commentParse.getArtist();
+                                    var artSeries = _commentParse.getArtSeries();
+                                    var dress = _commentParse.getDress();
+                                    var emotion = _commentParse.getEmotion();
+                                    if(targetCanvas){
                                         speakerName = targetCanvas.getAttribute('data-speakerName');
                                     }
+                                    if (_commentParse.getSpeakerName() != null) {
+                                        speakerName = _commentParse.getSpeakerName();
+                                    }
+                                    else if(!targetCanvas){
+                                        speakerName = "bouyomi";
+                                    }
                                     var speakerNum = speaker[speakerName];
-                                    if (baseCommandStart != -1) {                                        
-                                        console.log("####  baseCommandStart != -1");
-                                        var command = comment.slice(baseCommandStart + 2 , comment.length);
+                                    console.log(_commentParse.getCommand());
+                                    if (command != null) {                                        
+                                        console.log("####  command != null");
                                         //コマンドを受けてキャラ絵を操作
                                         if (command != "") {
                                             if (userId == masterId) {
@@ -169,11 +181,11 @@
                                                 if (canvasCount < maxUserCanvas) {
                                                     targetCanvas = canvases.create(userId, availablePosition);
                                                     //commandからディレクトリ指定文字列を生成
-                                                    speakerName = command.slice(0,command.length - 3);
+                                                    // speakerName = _commentParse.getSpeakerName();
                                                     var speakerNum = speaker[speakerName]
                                                     if (speakerNum) {
                                                         targetCanvas.setAttribute("data-speakerName", speakerName);
-                                                        var dataTargetDirectory = speakerName + "/" + command.slice(-3);
+                                                        var dataTargetDirectory = artist + "様/" + speakerName + "/" + artSeries + "/" + dress;
                                                         targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                                                         fixedCommand = dataTargetDirectory + "/" + "000";
                                                         document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
@@ -200,9 +212,10 @@
                                             //キャラ絵を既に呼び出している人
                                             else {
                                                 //表情差分指定コマンドは3桁の数字、それ以外はキャラ絵変更コマンドとみなす
-                                                if (Number(command) < 1000) {
-                                                    console.log("####    number(commmand) < 1000");
-                                                    var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + command;
+                                                if (emotion) {
+                                                    console.log("####    emotion");
+                                                    var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + emotion;
+                                                    console.log(fixedCommand);
                                                     _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                     stageUpdate(userStage[userId]);
@@ -210,10 +223,11 @@
                                                     talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                                 }
                                                 else{
-                                                    console.log("####  !number(command) < 1000 ");
+                                                    console.log("####  not emotion ");
                                                     var targetStage = userStage[userId];
-                                                    speakerName = command.slice(0,command.length - 3);
-                                                    var dataTargetDirectory = speakerName + "/" + command.slice(-3);
+                                                    console.log(speakerName);
+                                                    // speakerName = command.slice(0,command.length - 3);
+                                                    var dataTargetDirectory = artist + "様/" + speakerName + "/" + artSeries + "/" + dress;
                                                     fixedCommand = dataTargetDirectory + "/" + "000";
                                                     _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
