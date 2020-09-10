@@ -351,6 +351,7 @@ MigrationBackup/
 
 ignore/
 skins/
+skins_backup/
 akane.png
 aoi.png
 DemoVoiroGokko.html
