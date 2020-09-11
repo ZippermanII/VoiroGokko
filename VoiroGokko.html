@@ -16,6 +16,7 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
     <script src="HostSelect.js"></script>
+    <script src="ImageIndex.js"></script>
     <script src="CommentParse.js"></script>
     <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
@@ -23,6 +24,7 @@
     <script>
         var xmlFileName = "dummycommentlog.xml";
         var hostURL = "";
+        var index = null;
         var checkedXmlLine = 0;
         var canvases = new Canvases;
         var userId = "123456789";
@@ -73,6 +75,11 @@
 
         function init() {          
             hostURL = HostSelect(location.href);
+            imageIndex(hostURL).done(function(xml) {
+                index = xml;
+            }).fail(function(XMLHttpRequest, status, errorThrown) {
+                console.log("get imageindex error");
+            });
             getJSON();
             var subtitlesStage = new createjs.Stage("subtitleCanvas");
             createjs.Ticker.addEventListener('tick', mainLoop);
@@ -108,7 +115,7 @@
                         type: 'GET',
                         dataType: 'xml',
                         cache: false,
-                        timeout: 5000,
+                        timeout: 2000,
                         success: function (xml) {
                             try {
                                 xml = xml.getElementsByTagName('chat');
@@ -130,12 +137,12 @@
                                     try{
                                         comment = xml[i].firstChild.nodeValue;
                                     }catch(e){
-                                console.log("#### return　by xml have no child Error");
+                                console.log("#### return　by commentxml have no child Error");
                                         return;
                                     }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                     var targetCanvas = document.getElementById(userId);
-                                    var _commentParse = new commentParse(comment,speaker);
+                                    var _commentParse = new commentParse(comment,speaker,index);
                                     var talkStr = _commentParse.getTalkStr();
                                     var command = _commentParse.getCommand();
                                     var speakerName = "";
@@ -153,7 +160,6 @@
                                         speakerName = "bouyomi";
                                     }
                                     var speakerNum = speaker[speakerName];
-                                    console.log(_commentParse.getCommand());
                                     if (command != null) {                                        
                                         console.log("####  command != null");
                                         //コマンドを受けてキャラ絵を操作
@@ -185,7 +191,7 @@
                                                     var speakerNum = speaker[speakerName]
                                                     if (speakerNum) {
                                                         targetCanvas.setAttribute("data-speakerName", speakerName);
-                                                        var dataTargetDirectory = artist + "様/" + speakerName + "/" + artSeries + "/" + dress;
+                                                        var dataTargetDirectory = artist + "/" + speakerName + "/" + artSeries + "/" + dress;
                                                         targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                                                         fixedCommand = dataTargetDirectory + "/" + "000";
                                                         document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
@@ -215,7 +221,6 @@
                                                 if (emotion) {
                                                     console.log("####    emotion");
                                                     var fixedCommand = targetCanvas.getAttribute("data-targetDirectory") + "/" + emotion;
-                                                    console.log(fixedCommand);
                                                     _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                     stageUpdate(userStage[userId]);
@@ -225,9 +230,7 @@
                                                 else{
                                                     console.log("####  not emotion ");
                                                     var targetStage = userStage[userId];
-                                                    console.log(speakerName);
-                                                    // speakerName = command.slice(0,command.length - 3);
-                                                    var dataTargetDirectory = artist + "様/" + speakerName + "/" + artSeries + "/" + dress;
+                                                    var dataTargetDirectory = artist + "/" + speakerName + "/" + artSeries + "/" + dress;
                                                     fixedCommand = dataTargetDirectory + "/" + "000";
                                                     _tachieLoader[targetStage] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                     targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
