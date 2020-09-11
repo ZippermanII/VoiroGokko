@@ -1,4 +1,4 @@
-function commentParse(comment,speaker){
+function commentParse(comment,speaker,index){
     this.speakerName = null;
     this.artist = "";
     this.artSeries = "";
@@ -7,7 +7,7 @@ function commentParse(comment,speaker){
     this.talkStr = comment;
     this.command = null;
     var baseCommandStart = comment.lastIndexOf("##");
-    var artists =["MtU","blueberry","ふらすこ","えとのーと","ペテン師","こーすけさんたまりあ"];
+    var artists =[];
     if(baseCommandStart != -1){
         this.talkStr = comment.slice(0,baseCommandStart);
         this.command = comment.slice(baseCommandStart + 2 , comment.length);
@@ -20,7 +20,7 @@ function commentParse(comment,speaker){
             this.emotion = this.command;
             return;
         }
-        else if (!commandLastChara.match(/[^A-Z]/)) {
+        else if (!commandLastChara.match(/[^A-Z]/)) {//絵師名の最後がアルファベットだと不具合の恐れ要修正
             block3start -= 1;
             block4start -= 1;
             this.dress = commandLastChara;
@@ -29,13 +29,24 @@ function commentParse(comment,speaker){
             if(this.command.startsWith(key)){
                 this.speakerName = key;
                 block2start = key.length;
-                this.artist = this.command.slice(key.length, block3start);
-                this.artSeries = this.command.slice(block3start, block4start);
-                console.log(this.command);
-                console.log(key);
+                block2 = this.command.slice(block2start, block3start)
+                console.log(block2);
+                if(block2.match(/[^0-9]/gi)){
+                    this.artSeries = "series" + this.command.slice(block3start, block4start);
+                }
+                else{
+                    block2 = this.command.slice(block2start, block4start)
+                    this.artSeries = "series000"
+                }
+                this.artist = block2 + "様";
                 if (this.command == key) {
+                    index = index.getElementsByTagName(key);
+                    index = Array.prototype.slice.call(index);
+                    index.forEach(element => {
+                        artists.push(element.parentNode.nodeName)
+                    });
                     this.artist = artists[ Math.floor( Math.random() * artists.length ) ] ;
-                    this.artSeries = "000";           
+                    this.artSeries = "series000";           
                 }
                 break;
             }
