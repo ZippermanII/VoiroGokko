@@ -4,15 +4,15 @@ import os
 import pprint
 import xml.etree.ElementTree as ET
 import html
+from xml.dom import minidom
 
 loop = 0
 start = 0
 end = 0
 
-collection = glob.glob('skins/**/000.png', recursive=True)
-pprint.pprint(collection)
-os.system('PAUSE')
-
+os.remove('ignore/skins_collection.xml')
+# pprint.pprint(collection)
+# os.system('PAUSE')
 
 try:
     with open ("ignore/skins_collection.xml",mode='x') as f:
@@ -20,48 +20,28 @@ try:
         f.write(s)
 except FileExistsError:
     pass
-# xmlデータを読み込みます
+
 tree = ET.parse(os.path.join('ignore', 'skins_collection.xml'))
-# ツリーを取得
 root = tree.getroot()
-# XMLファイルの生成
-# element = ET.fromstring(come)
-# root.append(element)
-# print(come)
-# tree.write(os.path.join('ignore', 'skins_collection.xml'))
 
+collection = glob.glob('skins/**/000.png', recursive=True)
 
-
-for aaaaaaaaaa in collection:
-    r = aaaaaaaaaa.count('\\')
+for targetStr in collection:
+    count = 0
+    r = targetStr.count('\\')
     parent = root
     for i in range(r):
-        m = re.search(r'\\+', aaaaaaaaaa)
+        count += 1
+        m = re.search(r'\\+', targetStr)
         end = m.span()[0]
         s = m.span()[1]
-        bbbbbbbbbb = aaaaaaaaaa[0:end]
-        print(bbbbbbbbbb)
-        if bbbbbbbbbb.isdecimal():
-            bbbbbbbbbb = 'series' + bbbbbbbbbb
-        child = ET.SubElement(parent,bbbbbbbbbb)
-        print(child)
-        print('parent.tag = ' + parent.tag)
-        print('child.tag = ' + child.tag)
+        tagName = targetStr[0:end]   
+        child = ET.SubElement(parent,tagName)
         parent = child
         start = s
-        aaaaaaaaaa = aaaaaaaaaa[start:len(aaaaaaaaaa)]
-
-print (root)
+        targetStr = targetStr[start:len(targetStr)]
+        if count == r:
+            child.text = targetStr
+    
 tree.write(os.path.join('ignore', 'skins_collection.xml'), encoding="UTF-8")
-os.system('PAUSE')
-
-# def make_xml(self,come):
-#     # xmlデータを読み込みます
-#     tree = ET.parse(os.path.join('ignore', 'skins_collection.xml'))
-#     # ツリーを取得
-#     root = tree.getroot()
-#     # XMLファイルの生成
-#     element = ET.fromstring(come)
-#     root.append(element)
-#     print(come)
-#     tree.write(os.path.join('ignore', 'skins_collection.xml'))
+# os.system('PAUSE')
