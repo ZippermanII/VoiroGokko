@@ -133,6 +133,10 @@
                                     startTime = xml[i].getAttributeNode("date").value;
                                     startNo = xml[i].getAttributeNode("no").value;
                                     var userId = xml[i].getAttributeNode("user_id").value;
+                                    var isMaster = false;
+                                    if(userId == masterId){
+                                        isMaster = true;
+                                    }
                                     var comment = "";
                                     try{
                                         comment = xml[i].firstChild.nodeValue;
@@ -142,7 +146,7 @@
                                     }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
                                     var targetCanvas = document.getElementById(userId);
-                                    var _commentParse = new commentParse(comment,speaker,index);
+                                    var _commentParse = new commentParse(comment,speaker,index,isMaster);
                                     var talkStr = _commentParse.getTalkStr();
                                     var command = _commentParse.getCommand();
                                     var speakerName = "";

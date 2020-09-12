@@ -1,4 +1,4 @@
-function commentParse(comment,speaker,index){
+function commentParse(comment,speaker,index,isMaster){
     this.speakerName = null;
     this.artist = "";
     this.artSeries = "series000";
@@ -7,9 +7,15 @@ function commentParse(comment,speaker,index){
     this.talkStr = comment;
     this.command = null;
     var lastChara = comment[comment.length - 1]
-    if (lastChara == "。"){
-        this.talkStr = comment.slice(0,comment.length - 1)
-        lastChara = this.talkStr[this.talkStr.length - 1]
+    if(isMaster){
+        if (lastChara == "。"){
+            this.talkStr = comment.slice(0,comment.length - 1)
+            lastChara = this.talkStr[this.talkStr.length - 1]
+        }
+        console.log("comment = " + comment);
+        if(this.talkStr.endsWith("かな")){
+            this.talkStr +=  "？";
+        }
     }
     var baseCommandStart = comment.lastIndexOf("##");
     var artists =[];
