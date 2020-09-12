@@ -17,6 +17,8 @@ function commentParse(comment,speaker,index,isMaster){
             this.talkStr +=  "？";
         }
     }
+    // this.talkStr = this.talkStr.replace(/<u>.*<\/u>/g, ''); //ニコニコのURLを受け取った際に付与されているhtmlタグを除去しようと思った
+    this.talkStr = this.talkStr.replace(/http(s)?\:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=~]*)?/g, 'URLです');
     var baseCommandStart = comment.lastIndexOf("##");
     var artists =[];
     var randomEmote = ["000","004"];
