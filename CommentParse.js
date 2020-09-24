@@ -9,7 +9,7 @@ function commentParse(comment,speaker,index,isMaster){
     var lastChara = comment[comment.length - 1]
     if(isMaster){
         if (lastChara == "。"){
-            this.talkStr = comment.replace(/\s+/g, "");
+            this.talkStr = this.talkStr.replace(/\s+/g, "");
             this.talkStr = this.talkStr.slice(0,comment.length - 1);
             lastChara = this.talkStr[this.talkStr.length - 1];
         }
