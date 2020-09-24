@@ -29,6 +29,7 @@
         var canvases = new Canvases;
         var userId = "123456789";
         var masterId = "1166687";
+        var dummyMasterId = "0";
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
@@ -134,7 +135,7 @@
                                     startNo = xml[i].getAttributeNode("no").value;
                                     var userId = xml[i].getAttributeNode("user_id").value;
                                     var isMaster = false;
-                                    if(userId == masterId){
+                                    if(userId == masterId || userId == dummyMasterId){
                                         isMaster = true;
                                     }
                                     var comment = "";
@@ -168,7 +169,7 @@
                                         console.log("####  command != null");
                                         //コマンドを受けてキャラ絵を操作
                                         if (command != "") {
-                                            if (userId == masterId) {
+                                            if (userId == masterId || userId == dummyMasterId) {
                                                 if (command == "logout") {
                                                     console.log("####    masterlogout");
                                                     targetCanvas = document.getElementById(talkStr);
