@@ -9,8 +9,9 @@ function commentParse(comment,speaker,index,isMaster){
     var lastChara = comment[comment.length - 1]
     if(isMaster){
         if (lastChara == "。"){
-            this.talkStr = comment.slice(0,comment.length - 1)
-            lastChara = this.talkStr[this.talkStr.length - 1]
+            this.talkStr = comment.replace(/\s+/g, "");
+            this.talkStr = this.talkStr.slice(0,comment.length - 1);
+            lastChara = this.talkStr[this.talkStr.length - 1];
         }
         console.log("comment = " + comment);
         if(this.talkStr.endsWith("かな")){
