@@ -44,4 +44,5 @@ for targetStr in collection:
             child.text = targetStr
     
 tree.write(os.path.join('ignore', 'skins_collection.xml'), encoding="UTF-8")
+val = input('ディレクトリサーチ完了しました　Enter で終了 ')
 # os.system('PAUSE')
