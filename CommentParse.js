@@ -24,7 +24,7 @@ function commentParse(comment,speaker,index,isMaster){
     var artists =[];
     var randomEmote = ["000","004"];
     if(baseCommandStart != -1){
-        this.talkStr = comment.slice(0,baseCommandStart);
+        this.talkStr = this.talkStr.slice(0,baseCommandStart);
         this.command = comment.slice(baseCommandStart + 2 , comment.length);
         var commandArray = this.command.split('#');
         if(!this.command.match(/[^0-9]/gi)){
