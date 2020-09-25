@@ -22,6 +22,7 @@
     <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
+    <script src="AutoLogout.js"></script>
     <script>
         var xmlFileName = "dummycommentlog.xml";
         var hostURL = "";
@@ -93,7 +94,7 @@
                 xmlFileName = "commentlog.xml";
             }
 
-            var startTime = Math.floor(new Date().getTime() / 1000);
+            var startDate = Math.floor(new Date().getTime() / 1000);
             var CommentTimer = setInterval(CommentFunc, 500);
 
 
@@ -130,9 +131,10 @@
                                 if (isSpeaking) {
                                     break;
                                 }
-                                if ((startTime < xml[i].getAttributeNode("date").value) ||
-                                    ((startTime == xml[i].getAttributeNode("date").value) && (startNo < xml[i].getAttributeNode("no").value))) {
-                                    startTime = xml[i].getAttributeNode("date").value;
+                                var currentCommentDate =  xml[i].getAttributeNode("date").value;
+                                if ((startDate < currentCommentDate) ||
+                                    ((startDate == currentCommentDate) && (startNo < xml[i].getAttributeNode("no").value))) {
+                                    startDate = currentCommentDate;
                                     startNo = xml[i].getAttributeNode("no").value;
                                     var userId = xml[i].getAttributeNode("user_id").value;
                                     var isMaster = false;
@@ -147,6 +149,8 @@
                                         return;
                                     }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
+                                    var userCanvases = document.getElementById("UserCanvasWrapper").children;
+                                    var canvasCount = userCanvases.length;
                                     var targetCanvas = document.getElementById(userId);
                                     var _commentParse = new commentParse(comment,speaker,index,isMaster);
                                     var talkStr = _commentParse.getTalkStr();
@@ -158,6 +162,18 @@
                                     var emotion = _commentParse.getEmotion();
                                     if(targetCanvas){
                                         speakerName = targetCanvas.getAttribute('data-speakerName');
+                                        targetCanvas.setAttribute('data-lastCommentDate',currentCommentDate);
+                                    }
+                                    if(canvasCount >= maxUserCanvas){
+                                        userCanvases = Array.from( userCanvases ) ;
+                                        userCanvases.forEach(canvas => {
+                                            console.log("##################### last comment date = " + canvas.getAttribute('data-lastCommentDate'));
+                                            var lastCommentDate = canvas.getAttribute('data-lastCommentDate');
+                                            if((lastCommentDate - currentCommentDate) <= -600){
+                                                console.log("####    AutoLogout");
+                                                canvas.remove();
+                                            }
+                                        });
                                     }
                                     if (_commentParse.getSpeakerName() != null) {
                                         speakerName = _commentParse.getSpeakerName();
@@ -186,12 +202,11 @@
                                             }
                                             //キャラ絵をまだ呼び出していない人
                                             else if (!targetCanvas) {
-                                                var userCanvases = document.getElementById("UserCanvasWrapper").children;
-                                                var canvasCount = userCanvases.length;
                                                 // //user_canvasの属性data-positionの値から「存在しない数値かつ一番最小の数値」一つを見つけ出す
                                                 var availablePosition = minimumNumberDitect(userCanvases);
                                                 if (canvasCount < maxUserCanvas) {
                                                     targetCanvas = canvases.create(userId, availablePosition);
+                                                    targetCanvas.setAttribute('data-lastCommentDate',currentCommentDate);
                                                     //commandからディレクトリ指定文字列を生成
                                                     // speakerName = _commentParse.getSpeakerName();
                                                     var speakerNum = speaker[speakerName]

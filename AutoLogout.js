@@ -1,0 +1,2 @@
+function AutoLogout(selfURL){
+}
