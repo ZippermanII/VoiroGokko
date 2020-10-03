@@ -7,6 +7,7 @@ import re
 import os
 import json
 import time
+import random
 from datetime import datetime
 from xml.dom import minidom
 import sys
@@ -15,7 +16,6 @@ import xml.etree.ElementTree as ET
 #os.system('PAUSE')
 
 class DummyNicoliveCommentReceiver:
-
 
     def make_xml(self,come):
         # xmlデータを読み込みます
@@ -33,8 +33,6 @@ class DummyNicoliveCommentReceiver:
         base3 = '" user_id="'
         base4 = '">'
         base5 = '</chat>'
-        # base6 = '" user_id="'
-        # base7 = '" user_id="'
         if input_str[0].isdecimal() is False:
             input_str = "1" + input_str
         dummy_command = input_str[1:]
@@ -58,6 +56,20 @@ class DummyNicoliveCommentReceiver:
         dummy_id = str(int(nowStr[-1]) * 111111111111111111)
         output_str = base1 + str(now_ts) + base2 + str(no) + base3 + dummy_id + base4 + 'dummy_comment' + base5
         return  output_str
+
+    def random_cast(self,no,id):
+        base1 = '<chat date="'
+        base2 = '" no="'
+        base3 = '" user_id="'
+        base4 = '">'
+        base5 = '</chat>'
+        chara = ["yukari","maki","akane","aoi","kiritan","zunko","itako","tsuina","seika","sora","akari"]
+        dummy_id = str (id * 111111111111111111)
+        now = datetime.now()
+        now_ts = int(now.timestamp())
+        output_str = base1 + str(now_ts) + base2 + str(no) + base3 + dummy_id + base4 + '##' + random.choice(chara) + base5
+        return output_str
+
 #
 # # commentlog.xmlをバックアップし新たなxmlを生成
 # try:
@@ -106,6 +118,17 @@ while True:
             else:
                 time.sleep(5)
                 i = 0
+    elif inp == "randomcast":
+        i = 0
+        while i < 6:
+            dummystr = dncr.random_cast(no,i)
+            try:
+                dncr.make_xml(dummystr)
+            except:
+                import traceback
+                traceback.print_exc()
+            no += 1
+            i += 1
     else:
         dummystr = dncr.make_dummy_element(inp,no)
         print(dummystr)
