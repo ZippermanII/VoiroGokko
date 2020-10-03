@@ -18,6 +18,18 @@ function commentParse(comment,speaker,index,isMaster){
             this.talkStr +=  "？";
         }
     }
+    if(comment[0]=="/"){
+        if(comment.startsWith("/nicoad")){
+            var targetJSON = JSON.parse(comment.slice(8,comment.length));
+            var unit = ["兆円 ニコニ広告","万円 ニコニ広告","兆ジンバブエドル ニコニ広告","ペリカ ニコニ広告"]
+            this.talkStr = targetJSON["message"]
+            this.talkStr = this.talkStr.replace(/ptニコニ広告/, unit[Math.floor(Math.random() * unit.length)]);
+            this.speakerName = "seika";
+        }
+        else{
+            this.talkStr = "";
+        }
+    }
     // this.talkStr = this.talkStr.replace(/<u>.*<\/u>/g, ''); //ニコニコのURLを受け取った際に付与されているhtmlタグを除去しようと思った
     this.talkStr = this.talkStr.replace(/http(s)?\:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=~]*)?/g, 'URLです');
     var baseCommandStart = comment.lastIndexOf("##");
