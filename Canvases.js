@@ -37,11 +37,18 @@ class Canvases {
         newCanvas.style.position = "absolute";
         newCanvas.style.zIndex = 100 - availablePosition;
         //ポジションにあわせて描画位置を調整
-        if (availablePosition % 2 == 1) {
+        if(availablePosition == 2){
+            newCanvas.style.left = "-200px";
+            this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
+        }
+        else if(availablePosition == 3){
             newCanvas.style.left = "1600px";
         }
+        else if (availablePosition % 2 == 1) {
+            newCanvas.style.left = "1550px";
+        }
         else {
-            newCanvas.style.left = "-175px";
+            newCanvas.style.left = "-150px";
             //共通フォーマットが左向きなので画面右にくる画像は左右反転
             this.StyleDeclarationSetTransform(style, "scale(-1.0,1.0)");
         }
