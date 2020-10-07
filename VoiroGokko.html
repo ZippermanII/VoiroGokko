@@ -43,6 +43,7 @@
         var tachieBlinkLayer = 5;
         var speaker = {
             "akane":"2000",
+            "seyanaa":"2000a",
             "aoi":"2001",
             "yukari":"2003",
             "kiritan":"2002",
@@ -62,10 +63,12 @@
             "bouyomi":"4000"
         };
         var effectsNum = {
+            "2000a":"2000",
             "2010a":"2010"
         };
         var txtEdgeColor ={
             "2000":"ff80d5",
+            "2000a":"ff80d5",
             "2001":"80bfff",
             "2003":"b99ee8",
             "2002":"800000",
@@ -76,6 +79,7 @@
             "2008":"b82939",
             "2009":"00e626",
             "2010":"e6e600",
+            "2010a":"000000",
             "2011":"006400",
             "2012":"ffc0cb",
             "4000":"000000"
@@ -315,6 +319,10 @@
             }
             else if(speakerNum == "4000"){
                 effectsJSON[speakerNum].volume = 31;
+            }
+            if(speakerNum == "2000a"){
+                var unit = ["セヤナー","ヤデー","ウチナー","エビフライー",];
+                str = unit[Math.floor(Math.random() * unit.length)]
             }
             var effect = speakerNum;
             Object.keys(effectsNum).forEach(element => {
