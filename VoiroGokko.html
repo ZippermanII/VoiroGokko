@@ -45,6 +45,7 @@
             "akane":"2000",
             "seyanaa":"2000a",
             "aoi":"2001",
+            "dayonee":"2001a",
             "yukari":"2003",
             "kiritan":"2002",
             "akari":"2004",
@@ -64,12 +65,14 @@
         };
         var effectsNum = {
             "2000a":"2000",
+            "2001a":"2001",
             "2010a":"2010"
         };
         var txtEdgeColor ={
             "2000":"ff80d5",
             "2000a":"ff80d5",
             "2001":"80bfff",
+            "2001a":"80bfff",
             "2003":"b99ee8",
             "2002":"800000",
             "2004":"d38f34",
@@ -321,7 +324,11 @@
                 effectsJSON[speakerNum].volume = 31;
             }
             if(speakerNum == "2000a"){
-                var unit = ["セヤナー","ヤデー","ウチナー","エビフライー",];
+                var unit = ["セヤナー？","ヤデー","ウチナー？","エビフライー","アオイー？"];
+                str = unit[Math.floor(Math.random() * unit.length)]
+            }
+            else if (speakerNum == "2001a"){
+                var unit = ["ダヨネー？","デスー","オネエチャンー？","チョコミントアイスー",];
                 str = unit[Math.floor(Math.random() * unit.length)]
             }
             var effect = speakerNum;
