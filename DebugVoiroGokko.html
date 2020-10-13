@@ -22,6 +22,7 @@
     <script src="TachieLoader.js"></script>
     <script src="Canvases.js"></script>
     <script src="Subtitles.js"></script>
+    <script src="SpeakString.js"></script>
     <script src="AutoLogout.js"></script>
     <script>
         var xmlFileName = "dummycommentlog.xml";
@@ -90,6 +91,7 @@
         var isSpeaking = false;
         var effectsJSON = {};
         var emotionsJSON = {};
+        var speakStringJSON = {};
 
 
         function init() {          
@@ -306,6 +308,8 @@
             effectsJSON = await talkerEffectsJSON.json();
             talkerEmotionsJSON = await fetch(hostURL + 'ignore/talker_emotions.json',{"method":"GET"});
             emotionsJSON = await talkerEmotionsJSON.json();
+            talkerEmotionsJSON = await fetch(hostURL + 'ignore/speak_string.json',{"method":"GET"});
+            speakStringJSON = await talkerEmotionsJSON.json();
         }
         
         async function talk(str,speakerNum,targetCanvas,subtitlesStage){  
@@ -323,24 +327,21 @@
             else if(speakerNum == "4000"){
                 effectsJSON[speakerNum].volume = 31;
             }
-            if(speakerNum == "2000a"){
-                var unit = ["セヤナー？","ヤデー","ウチナー？","エビフライー","アオイー？"];
-                str = unit[Math.floor(Math.random() * unit.length)]
-            }
-            else if (speakerNum == "2001a"){
-                var unit = ["ダヨネー？","デスー","オネエチャンー？","チョコミントアイスー",];
-                str = unit[Math.floor(Math.random() * unit.length)]
-            }
+            str = speakString(str,speakerNum,speakStringJSON);
+            // if(speakerNum == "2000a"){
+            //     var unit = ["セヤナー？","ヤデー","ウチナー？","エビフライー","アオイー？"];
+            //     str = unit[Math.floor(Math.random() * unit.length)]
+            // }
+            // else if (speakerNum == "2001a"){
+            //     var unit = ["ダヨネー？","デスー","オネエチャンー？","チョコミントアイスー",];
+            //     str = unit[Math.floor(Math.random() * unit.length)]
+            // }
             var effect = speakerNum;
             Object.keys(effectsNum).forEach(element => {
                 if (element == speakerNum) {
                     speakerNum = effectsNum[speakerNum];
                 }
             });
-            // else{
-            //     effectsJSON[speakerNum].volume = 1;
-            // }
-            //
             //VScodeで横長を解消する alt+z
             const fetchopt = {
                 "mode":"no-cors",
