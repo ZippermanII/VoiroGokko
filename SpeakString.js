@@ -2,9 +2,13 @@
 
 function speakString(str,speakerNum,speakStringJSON) {    
     if (speakerNum == "2002"){
-        var kiritanReplace = {"じゃん":"じょん","ジャン":"ジョン"};
+        var kiritanReplace = {"ジャン":"ジョン"};
         Object.keys(kiritanReplace).forEach(element => {
-            if (str.match(new RegExp(element, 'gi'))) {
+            if( str == "やるじゃん"){
+                str = "やるじょん";
+                return str;
+            }
+            else if (str.match(new RegExp(element, 'gi'))) {
                 var replaceTarget = element;
                 var replaceStr = kiritanReplace[element];
                 str = str.replace(new RegExp(replaceTarget, 'gi'), replaceStr); 
