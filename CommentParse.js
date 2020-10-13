@@ -32,12 +32,12 @@ function commentParse(comment,speaker,index,isMaster){
     }
     // this.talkStr = this.talkStr.replace(/<u>.*<\/u>/g, ''); //ニコニコのURLを受け取った際に付与されているhtmlタグを除去しようと思った
     this.talkStr = this.talkStr.replace(/http(s)?\:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=~]*)?/g, 'URLです');
-    var baseCommandStart = comment.lastIndexOf("##");
+    var baseCommandStart = this.talkStr.lastIndexOf("##");
     var artists =[];
     var randomEmote = ["000","004"];
     if(baseCommandStart != -1){
+        this.command = this.talkStr.slice(baseCommandStart + 2 , this.talkStr.length);
         this.talkStr = this.talkStr.slice(0,baseCommandStart);
-        this.command = comment.slice(baseCommandStart + 2 , comment.length);
         var commandArray = this.command.split('#');
         if(!this.command.match(/[^0-9]/gi)){
             this.emotion = this.command;
