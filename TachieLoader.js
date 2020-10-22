@@ -22,6 +22,16 @@ function tachieLoader(fixedCommand,canvas,hostURL) {
         this.skinimage.y += (Math.pow(adjustForSdChara,2.5)) * 15;
         this.skinimage.scaleX = scaling;
         this.skinimage.scaleY = scaling; 
+        if(canvas.getAttribute("data-position") == "999"){
+            var shape = new createjs.Shape();
+            shape.graphics.drawCircle(200,200, 100);
+            shape.graphics.beginFill("DarkRed");
+            this.skinimage.mask = shape;
+            this.skinimage.x += (Math.pow(adjustForSdChara,1.5)) * 90;
+            this.skinimage.y += 60 - (Math.pow(adjustForSdChara,5));
+            this.skinimage.scaleX *= 0.5;
+            this.skinimage.scaleY *= 0.5; 
+        }
     }).bind(this), false);//注意
     this.skinloader.load();//注意
 }

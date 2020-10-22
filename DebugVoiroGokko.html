@@ -36,6 +36,7 @@
         var userStage  = {};
         var _tachieLoader = {};
         var charaChange = false;
+        var isAudience = false;
         var startNo = 0;
         var maxUserCanvas = 6;
         var maxChildIndex = 10;
@@ -167,7 +168,7 @@
                                         return;
                                     }
                                     //ニコ生のコメントからコマンド文字列を取得してcommand変数に格納
-                                    var userCanvases = document.getElementById("UserCanvasWrapper").children;
+                                    var userCanvases = document.getElementById("PlayerCanvasWrapper").children;
                                     var canvasCount = userCanvases.length;
                                     var targetCanvas = document.getElementById(userId);
                                     var _commentParse = new commentParse(comment,speaker,index,isMaster);
@@ -178,14 +179,15 @@
                                     var artSeries = _commentParse.getArtSeries();
                                     var dress = _commentParse.getDress();
                                     var emotion = _commentParse.getEmotion();
+                                    isAudience = false;
                                     if(targetCanvas){
                                         speakerName = targetCanvas.getAttribute('data-speakerName');
                                         targetCanvas.setAttribute('data-lastCommentDate',currentCommentDate);
                                     }
+                                    //満員かつ10分発言がない人は自動logout
                                     if(canvasCount >= maxUserCanvas){
                                         userCanvases = Array.from( userCanvases ) ;
                                         userCanvases.forEach(canvas => {
-                                            console.log("##################### last comment date = " + canvas.getAttribute('data-lastCommentDate'));
                                             var lastCommentDate = canvas.getAttribute('data-lastCommentDate');
                                             if((lastCommentDate - currentCommentDate) <= -600){
                                                 console.log("####    AutoLogout");
@@ -226,14 +228,13 @@
                                                     targetCanvas = canvases.create(userId, availablePosition);
                                                     targetCanvas.setAttribute('data-lastCommentDate',currentCommentDate);
                                                     //commandからディレクトリ指定文字列を生成
-                                                    // speakerName = _commentParse.getSpeakerName();
                                                     var speakerNum = speaker[speakerName]
                                                     if (speakerNum) {
                                                         targetCanvas.setAttribute("data-speakerName", speakerName);
                                                         var dataTargetDirectory = artist + "/" + speakerName + "/" + artSeries + "/" + dress;
                                                         targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
                                                         fixedCommand = dataTargetDirectory + "/" + "000";
-                                                        document.getElementById("UserCanvasWrapper").appendChild(targetCanvas);
+                                                        document.getElementById("PlayerCanvasWrapper").appendChild(targetCanvas);
                                                         userStage[userId] = new createjs.Stage(targetCanvas);
                                                         _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
                                                         for (let index = 0; index < maxChildIndex - 1; index++) {
@@ -249,9 +250,34 @@
                                                         talk(talkStr,'4000',targetCanvas,subtitlesStage);
                                                     }
                                                 }
-                                                //20200802動作未検証
+                                                //呼出上限の場合　20200802動作未検証
                                                 else{
-                                                    talk(talkStr,'4000',targetCanvas,subtitlesStage);
+                                                    targetCanvas = canvases.create(userId, 999);
+                                                    targetCanvas.style.display ="none";
+                                                    targetCanvas.setAttribute('data-lastCommentDate',currentCommentDate);
+                                                    //commandからディレクトリ指定文字列を生成
+                                                    var speakerNum = speaker[speakerName]
+                                                    if (speakerNum) {
+                                                        targetCanvas.setAttribute("data-speakerName", speakerName);
+                                                        var dataTargetDirectory = artist + "/" + speakerName + "/" + artSeries + "/" + dress;
+                                                        targetCanvas.setAttribute("data-targetDirectory", dataTargetDirectory);
+                                                        fixedCommand = dataTargetDirectory + "/" + "000";
+                                                        document.getElementById("AudienceCanvasWrapper").appendChild(targetCanvas);
+                                                        userStage[userId] = new createjs.Stage(targetCanvas);
+                                                        _tachieLoader[userStage[userId]] = new tachieLoader(fixedCommand, targetCanvas,hostURL);
+                                                        for (let index = 0; index < maxChildIndex - 1; index++) {
+                                                            //この_emptyImgLoaderなぜかこのスコープ内で宣言ならmaxChildIndex回呼び出される上位で宣言すると1回のみ
+                                                            var _emptyImgLoader = new tachieLoader("empty", targetCanvas,hostURL);
+                                                            userStage[userId].addChildAt(_emptyImgLoader.getSkinImage(targetCanvas.width),index);
+                                                        }                                                            
+                                                        userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(targetCanvas.width),tachieBaseLayer);
+                                                        successLoadingCheck_A(targetCanvas,userStage[userId],_tachieLoader[userStage[userId]]);
+                                                        isAudience = true;
+                                                        talk(talkStr,speakerNum,targetCanvas,subtitlesStage);  
+                                                    }
+                                                    else{
+                                                        talk(talkStr,'4000',targetCanvas,subtitlesStage);
+                                                    }
                                                 }
                                             }
                                             //キャラ絵を既に呼び出している人
@@ -264,6 +290,10 @@
                                                     userStage[userId].addChildAt(_tachieLoader[userStage[userId]].getSkinImage(),tachieEmotionLayer);
                                                     stageUpdate(userStage[userId]);
                                                     userStage[userId].removeChildAt(tachieEmotionLayer +1);
+                                                    if(targetCanvas.getAttribute("data-position") == "999"){
+                                                        console.log("################# position = 999" );
+                                                        isAudience = true;
+                                                    }
                                                     talk(talkStr,speakerNum,targetCanvas,subtitlesStage);
                                                 }
                                                 else{
@@ -275,6 +305,9 @@
                                                     targetStage.addChild(_tachieLoader[targetStage].getSkinImage(targetCanvas.width));
                                                     successLoadingCheck_B(talkStr,targetCanvas,speakerName,dataTargetDirectory,targetStage,_tachieLoader[targetStage],subtitlesStage);
                                                     targetStage.removeChildAt(tachieBaseLayer + 1);
+                                                    if(targetCanvas.getAttribute("data-position") == "999"){
+                                                        isAudience = true;
+                                                    }
                                                 }
                                             }
                                         }
@@ -317,7 +350,7 @@
             if ((str == "")||(str[0]=="/")) {            
                 return;
             }
-            var SubGen = new Subtitles(str,txtEdgeColor[speakerNum]);
+            var SubGen = new Subtitles(str,txtEdgeColor[speakerNum],isAudience);
             subtitlesStage.addChild(SubGen.getEdgeCommentText());
             subtitlesStage.addChild(SubGen.getCommentText());
             //生声配信時用ボリュームダウン設定 
@@ -328,14 +361,6 @@
                 effectsJSON[speakerNum].volume = 31;
             }
             str = speakString(str,speakerNum,speakStringJSON);
-            // if(speakerNum == "2000a"){
-            //     var unit = ["セヤナー？","ヤデー","ウチナー？","エビフライー","アオイー？"];
-            //     str = unit[Math.floor(Math.random() * unit.length)]
-            // }
-            // else if (speakerNum == "2001a"){
-            //     var unit = ["ダヨネー？","デスー","オネエチャンー？","チョコミントアイスー",];
-            //     str = unit[Math.floor(Math.random() * unit.length)]
-            // }
             var effect = speakerNum;
             Object.keys(effectsNum).forEach(element => {
                 if (element == speakerNum) {
@@ -357,14 +382,20 @@
                     "emotions":emotionsJSON[effect]
                 }),
             };
+            if (!isAudience){
             speakEffect(targetCanvas);
+            }
             isSpeaking = true;
+            targetCanvas.style.display ="block";
             console.log("before fetch");
             const res = await fetch("http://localhost:7180/PLAY2/" + speakerNum, fetchopt);
             console.log("after fetch");
             // const json = await res.json();
             isSpeaking = false;
             subtitlesStage.removeAllChildren();
+            if(isAudience == true){
+                targetCanvas.style.display ="none";
+            }
         }
 
         function sleep(msec) {
@@ -523,7 +554,9 @@
     </script>
 </head>
 <body onload="init();">
-    <div id="UserCanvasWrapper">
+    <div id="PlayerCanvasWrapper">
+    </div>
+    <div id="AudienceCanvasWrapper">
     </div>
     <div id="another">
         <canvas id="subtitleCanvas" width="1920" height="1080" style="position: absolute; z-index: 200; left: 0px; transform: scale(1, 1); top: 900px;"></canvas>

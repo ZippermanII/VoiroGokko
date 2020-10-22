@@ -1,4 +1,4 @@
-function Subtitles(talkStr,sentenceEdgeColor){ 
+function Subtitles(talkStr,sentenceEdgeColor,isAudience){ 
 	// var TalkStr = new Object(); 
 	var Canvas = new Object();
     Canvas = {};
@@ -27,6 +27,10 @@ function Subtitles(talkStr,sentenceEdgeColor){
 	var fontsize = 160;
 	var minFontSize = 80;
 	var sentenceMaxLength = 1320;
+	console.log("################# audience = " + isAudience);
+	if(isAudience){
+		sentenceMaxLength = 990;
+	}
 	var additionalwidth = 170;
 	this.textcomment.font = 'bold ' + String(fontsize) + "px " + 'Umeboshi';
 	this.textcomment.lineHeight = 80;
@@ -44,12 +48,6 @@ function Subtitles(talkStr,sentenceEdgeColor){
 			this.textcomment.text = "";
 			i = -1;
 			continue;
-			// if(Canvas['sentenceLengthValue'].trim() != "") {
-			// 	this.textcomment.text = 
-			// 	  this.textcomment.text.substr(0, (this.textcomment.text.length-Canvas['sentenceLengthValue'].trim().length))
-			// 	 + Canvas['sentenceLengthValue'].trim();
-			// }
-			// break;
 		}
 		else{
 			this.textcomment.text = this.textcomment.text + '\r';
@@ -70,16 +68,6 @@ function Subtitles(talkStr,sentenceEdgeColor){
 			break;
 		}
 	}
-	// sentenceWidth = Number(Number(this.textcomment.getMeasuredWidth())+Number(Canvas['sentenceLeftSpace']));
-	// while (sentenceWidth > Number(Canvas['sentenceLength'])) {
-	// 	if ( fontsize < 60) {
-	// 		break;
-	// 	}
-	// 	fontsize -= 10;
-	// 	this.textcomment.font = 'bold ' + String(fontsize) + "px " + 'Umeboshi';
-	//  	sentenceWidth = Number(Number(this.textcomment.getMeasuredWidth())+Number(Canvas['sentenceLeftSpace']));
-	// 	console.log(sentenceWidth);
-	// }
 	this.textcomment.x = 960;
 	this.textcomment.y = 10;
 	// this.textcomment.y = Number(Canvas['sentenceUpSpace']) + HcgFormat['SkinHeight']*(HcgFormat['CommentMax']-1);
